@@ -44,13 +44,11 @@ for test = 1:2
      [pixelTP,pixelFP,pixelFN,pixelTN,pixelPrecision, pixelRecall,pixelFMeasure] = PerformanceEvaluationPixel(TP_images, FP_images, FN_images, TN_images);
     metrics(:,test)= [pixelTP,pixelFP,pixelFN,pixelTN];
     metrics2(:,test) = [pixelPrecision, pixelRecall,pixelFMeasure];
-end
-
-FMeasure = (2*TP_images)./(2*TP_images + FN_images + FP_images);
-cumFM = cumsum(FMeasure);
-cumTP = cumsum(TP_images);
-cumTotalP=cumsum(TP_images + FP_images);
-
+    FMeasure = (2*TP_images)./(2*TP_images + FN_images + FP_images);
+    cumFM = cumsum(FMeasure);
+    cumTP = cumsum(TP_images);
+    cumTotalP=cumsum(TP_images + FP_images);
+    figure,
 subplot(121),
 plot(1:200,FMeasure);
 title 'Fmeasure non Accumulative'
@@ -77,9 +75,42 @@ legend('TP','TP+FP')
 xlabel('Frame')
 ylabel('Pixels')
 title 'Non accumulative'
+end
 
-
-
-
-
-
+% FMeasure = (2*TP_images)./(2*TP_images + FN_images + FP_images);
+% cumFM = cumsum(FMeasure);
+% cumTP = cumsum(TP_images);
+% cumTotalP=cumsum(TP_images + FP_images);
+% figure,
+% subplot(121),
+% plot(1:200,FMeasure);
+% title 'Fmeasure non Accumulative'
+% xlabel('Frame')
+% ylabel('Value')
+% 
+% subplot(122),
+% plot(1:200,cumFM);
+% title 'Fmeasure Accumulative'
+% xlabel('Frame')
+% ylabel('Value')
+% 
+% figure,
+% subplot(121),
+% plot(1:200,cumTP,'r',1:200,cumTotalP,'b')
+% legend('TP','TP+FP')
+% xlabel('Frame')
+% ylabel('Pixels')
+% title 'Accumulative'
+% 
+% subplot(122),
+% plot(1:200,TP_images,'r',1:200,TP_images+FP_images,'b')
+% legend('TP','TP+FP')
+% xlabel('Frame')
+% ylabel('Pixels')
+% title 'Non accumulative'
+% 
+% 
+% 
+% 
+% 
+% 
