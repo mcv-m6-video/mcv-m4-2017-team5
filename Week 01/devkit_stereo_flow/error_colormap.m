@@ -1,5 +1,6 @@
 function cols = error_colormap ()
-
+%First two columns: interval for histogram
+%Other columns: RGB color for each bar of histogram
 cols = [ 0,       0.1875,  49,  54, 149;
          0.1875,  0.375,   69, 117, 180;
          0.375,   0.75,   116, 173, 209;
@@ -12,3 +13,4 @@ cols = [ 0,       0.1875,  49,  54, 149;
         48,     inf,      165,   0,  38 ];
       
 cols(:,3:5) = cols(:,3:5)/255;
+end

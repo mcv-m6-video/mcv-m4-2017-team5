@@ -12,3 +12,4 @@ E_dv = F_gt_dv - F_est_dv;
 E    = sqrt(E_du.^2 + E_dv.^2);
 %If the pixel is occluded, the value is wrong
 E(F_gt_val == 0) = 0;
+end
