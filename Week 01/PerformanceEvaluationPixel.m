@@ -13,10 +13,11 @@ function [pixelTP,pixelFP,pixelFN,pixelTN,pixelPrecision, pixelRecall,pixelFMeas
     %    'pixelTN'           Number of True  Negative pixels
     %
     % The function returns the precision, accuracy, specificity and sensitivity
-    pixelTP= sum(TP_images);
-    pixelFP= sum(FP_images);
-    pixelFN= sum(FN_images);
-    pixelTN= sum(TN_images);
+    
+    pixelTP = sum(TP_images);
+    pixelFP = sum(FP_images);
+    pixelFN = sum(FN_images);
+    pixelTN = sum(TN_images);
     
     pixelPrecision = pixelTP / (pixelTP+pixelFP);
     pixelRecall = pixelTP / (pixelTP+pixelFN);

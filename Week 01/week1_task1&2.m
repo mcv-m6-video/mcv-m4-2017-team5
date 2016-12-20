@@ -80,6 +80,3 @@ title 'Non accumulative'
 
 
 
-
-
-
