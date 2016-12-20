@@ -14,13 +14,12 @@ dirSc = dir([directory_scene '/*.jpg']);
 dirA = dir([directory_imagesA '/*.png']);
 dirB = dir([directory_imagesB '/*.png']);
 
-    TP_images = zeros(length(dirGT), 1);
-    FP_images = zeros(length(dirGT), 1);
-    FN_images = zeros(length(dirGT), 1);
-    TN_images = zeros(length(dirGT), 1);
+TP_images = zeros(length(dirGT), 1);
+FP_images = zeros(length(dirGT), 1);
+FN_images = zeros(length(dirGT), 1);
+TN_images = zeros(length(dirGT), 1);
 
-video = VideoWriter ('videoB2');
-open(video)
+filename = 'videoB.gif';
 for test = 2:2  
     switch test
         case 1
@@ -51,10 +50,16 @@ for test = 2:2
         axis([0 200 0 1])
 
 
+
         frame = getframe(gcf);
-        writeVideo(video,frame);
+        im=frame2im(frame);
+        [imind,cm]=rgb2ind(im,256);
         
-    pause(0.01)
+        % On the first loop, create the file. In subsequent loops, append.
+         if i==1
+             imwrite(imind,cm,filename,'gif','DelayTime',0,'Loopcount',inf);
+         else
+            imwrite(imind,cm,filename,'gif','DelayTime',0,'WriteMode','append');
+         end
     end
 end
-close(video);
