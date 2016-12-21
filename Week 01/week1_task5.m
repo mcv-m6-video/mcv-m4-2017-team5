@@ -1,4 +1,5 @@
 clear all; close all;
+addpath(genpath('.'));
 
 path_kitti = '../Database/Kitti/images';
 path_results_given_kitti = '../Results_given_week01/results_opticalflow_kitti';
