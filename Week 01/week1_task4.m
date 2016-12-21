@@ -61,52 +61,50 @@ FP_sequence = sum(FP_images, 1);
 FM_sequence = (2*TP_sequence)./(2*TP_sequence + FN_sequence + FP_sequence);
 
 %%
-%Plots for test B
+%Plots for test A
+test = 1;
 %Plot: accumulative Fmeasure. One curve per desync
 desyncs_plot = [0 10 20 25];
 colors_plot = {'red', 'blue', 'green', 'magenta'};
-figure
+figure('Color', [1 1 1])
 for i = 1:length(desyncs_plot)
-    plot(1:200, FMeasure(:, 2, desyncs_plot(i) + 1), colors_plot{i})
+    plot(1:200, FMeasure(:, test, desyncs_plot(i) + 1), colors_plot{i})
     hold on
 end
 hold off
+legend('Without delay','Delay of 10 frames','Delay of 20 frames','Delay of 25 frames')
+xlabel('Frame number')
+ylabel('F1 Measure')
+title 'Forward de-synchronized results frame by frame with test A'
 %Plot: Global Fmeasure. One point per desync, one curve for all
-FM_plot = shiftdim(FM_sequence(1, 2, :));
+FM_plot = shiftdim(FM_sequence(1, test, :));
 
-figure
+figure('Color', [1 1 1])
 plot(0:desync_max, FM_plot, 'red')
+title 'Forward de-synchronized results for sequence with test A'
+xlabel('Frames of delay')
+ylabel('F1 Measure')
 
+%test B
+test = 2;
+%Plot: accumulative Fmeasure. One curve per desync
+desyncs_plot = [0 10 20 25];
+colors_plot = {'red', 'blue', 'green', 'magenta'};
+figure('Color', [1 1 1])
+for i = 1:length(desyncs_plot)
+    plot(1:200, FMeasure(:, test, desyncs_plot(i) + 1), colors_plot{i})
+    hold on
+end
+hold off
+legend('Without delay','Delay of 10 frames','Delay of 20 frames','Delay of 25 frames')
+xlabel('Frame number')
+ylabel('F1 Measure')
+title 'Forward de-synchronized results frame by frame with test B'
+%Plot: Global Fmeasure. One point per desync, one curve for all
+FM_plot = shiftdim(FM_sequence(1, test, :));
 
-% subplot(121),
-% plot(1:200,FMeasure);
-% title 'Fmeasure non Accumulative'
-% xlabel('Frame')
-% ylabel('Value')
-%
-% subplot(122),
-% plot(1:200,cumFM);
-% title 'Fmeasure Accumulative'
-% xlabel('Frame')
-% ylabel('Value')
-%
-% figure,
-% subplot(121),
-% plot(1:200,cumTP,'r',1:200,cumTotalP,'b')
-% legend('TP','TP+FP')
-% xlabel('Frame')
-% ylabel('Pixels')
-% title 'Accumulative'
-%
-% subplot(122),
-% plot(1:200,TP_images,'r',1:200,TP_images+FP_images,'b')
-% legend('TP','TP+FP')
-% xlabel('Frame')
-% ylabel('Pixels')
-% title 'Non accumulative'
-
-
-
-
-
-
+figure('Color', [1 1 1])
+plot(0:desync_max, FM_plot, 'red')
+title 'Forward de-synchronized results for sequence with test B'
+xlabel('Frames of delay')
+ylabel('F1 Measure')
