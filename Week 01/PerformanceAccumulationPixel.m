@@ -15,7 +15,7 @@ function [pixelTP, pixelFP, pixelFN, pixelTN] = PerformanceAccumulationPixel(pix
     % False Negative (pixelFN) and True Negative (pixelTN) pixels in the image pixelCandidates
 
     pixelCandidates = pixelCandidates > 0;
-    pixelAnnotation = pixelAnnotation > 160;
+    pixelAnnotation = pixelAnnotation ==255;
     
     pixelTP = sum(sum(pixelCandidates > 0 & pixelAnnotation > 0));
     pixelFP = sum(sum(pixelCandidates > 0 & pixelAnnotation == 0));
