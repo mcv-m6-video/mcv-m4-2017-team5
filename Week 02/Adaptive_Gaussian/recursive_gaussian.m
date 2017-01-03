@@ -3,7 +3,7 @@ function [ imagesSeg ] = recursive_gaussian( param )
 
 train = 1:floor(param.percentage*length(param.dirIn));
 
-test = floor(param.percentage*length(param.dirIn)):length(param.dirIn);
+test = floor(param.percentage*length(param.dirIn))+1:length(param.dirIn);
 
 
 images_train = zeros(param.ni, param.nj, length(train));

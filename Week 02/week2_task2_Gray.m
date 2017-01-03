@@ -9,8 +9,8 @@ directory_sequence = '../Database/Week02/highway/';
 % directory_sequence = '../Database/Week02/traffic/';
 
 directory_write = '../Results/week2/';
-alpha = 0.01;
-rho = 0.1;
+alpha = 0.07;
+rho = 0;
 percentage = 0.5;
 
 param  = compute_parameters_w2(directory_sequence, directory_write, alpha, rho, percentage);
