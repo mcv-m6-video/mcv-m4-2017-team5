@@ -3,7 +3,7 @@ function [ imagesSeg ] = recursive_gaussian( param )
 
 train = 1:floor(param.percentage*length(param.dirIn));
 
-test = floor(param.percentage*length(param.dirIn))+1:length(param.dirIn);
+test = floor(param.percentage*length(param.dirIn)) + 1:length(param.dirIn);
 
 
 images_train = zeros(param.ni, param.nj, length(train));
@@ -32,12 +32,12 @@ for i = 1:length(test)
     segmentation = abs(im - mu) >= param.alpha*(2 + sigma);
     imagesSeg(:, :, i) = segmentation;
     % Save results
-%     imwrite( segmentation, strcat(param.directory_write,'/', param.dirIn(test(i)).name));
+    imwrite( segmentation, strcat(param.directory_write,'/', param.dirIn(test(i)).name));
     
     
     %Update background model with pixels labeled as background
-    mu = segmentation.*(param.rho*im + (1 - param.rho*mu)) + (1 - segmentation).*mu;
-    sigma = segmentation.*(param.rho*(im - mu).^2 + (1 - param.rho)*sigma.^2) + (1 - segmentation).*sigma;
+    mu = (1 - segmentation).*(param.rho*im + (1 - param.rho)*mu) + segmentation.*mu;
+    sigma = sqrt((1 - segmentation).*(param.rho*(im - mu).^2 + (1 - param.rho)*sigma.^2) + segmentation.*sigma.^2);
 end
 end
 

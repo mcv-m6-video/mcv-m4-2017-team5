@@ -1,6 +1,6 @@
 function [ metrics, metrics2 ] = evaluate_model_adaptive( imagesSeg, param )
 
-test = floor(param.percentage*length(param.dirIn))+1:length(param.dirIn);
+test = floor(param.percentage*length(param.dirIn)) + 1:length(param.dirIn);
 
 TP_images = zeros(length(test), 1);
 FP_images = zeros(length(test), 1);

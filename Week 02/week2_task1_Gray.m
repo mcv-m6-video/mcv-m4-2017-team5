@@ -5,9 +5,9 @@ addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
 
-directory_sequence = 'Database/Week02/highway/';
-% directory_sequence = 'Database/Week02/fall/';
-% directory_sequence = 'Database/Week02/traffic/';
+% directory_sequence = '../Database/Week02/highway/';
+% directory_sequence = '../Database/Week02/fall/';
+directory_sequence = '../Database/Week02/traffic/';
 
 directory_imagesIn = strcat(directory_sequence, 'input/');
 directory_imagesGT = strcat(directory_sequence, 'groundtruth/');
@@ -15,12 +15,12 @@ directory_imagesGT = strcat(directory_sequence, 'groundtruth/');
 dirIn = dir([directory_imagesIn '/*.jpg']);
 dirGT = dir([directory_imagesGT '/*.png']);
 percentage = 0.5;
-alpha=0.07;
+alpha=0.1;
 
 train = 1:floor(percentage*length(dirIn));
-test = floor(percentage*length(dirIn))+1:length(dirIn);
+test = floor(percentage*length(dirIn)) + 1:length(dirIn);
 
-[dim1, dim2, dim3] = size(imread(dirIn(1).name));
+[dim1, dim2, dim3] = size(imread(strcat(directory_imagesIn, dirIn(1).name)));
 
 
 images_train = zeros(dim1, dim2,length(train));
@@ -34,7 +34,8 @@ imagesSeg = zeros(dim1, dim2, length(test));
 %computed.
 
 for i = train
-    images_train(:,:,i) = rgb2gray(im2double(imread(dirIn(i).name)));
+%     images_train(:,:,i) = rgb2gray(im2double(imread(dirIn(i).name)));
+    images_train(:,:,i) = rgb2gray(im2double(imread(strcat(directory_imagesIn, dirIn(i).name))));
 end
 
 
@@ -54,7 +55,7 @@ end
 %segmented
 %  for alpha = 0.001:0.001:0.2
 for i = test
-    images_test(:,:,i-length(test)+1) = rgb2gray(im2double(imread(dirIn(i).name)));
+    images_test(:,:,i-length(test)+1) = rgb2gray(im2double(imread(strcat(directory_imagesIn,dirIn(i).name))));
     imagesSeg(:,:,i-length(test)+1) = abs(images_test(:,:,i-length(test)+1)-mu(:,:)) >= alpha*(2+sigma(:,:));
        
 end
