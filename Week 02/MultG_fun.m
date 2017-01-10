@@ -48,9 +48,9 @@ Fold = [video];
         end
  end
     
-    Frame(:,:,1)=rgb2gray(imread(['./' Fold '/' VideoInFolder '/'  begin num2str(T1) '.jpg'])); 
-    Frame(:,:,2)=rgb2gray(imread(['./' Fold '/' VideoInFolder '/'  begin num2str(T1) '.jpg'])); 
-    Frame(:,:,3)=rgb2gray(imread(['./' Fold '/' VideoInFolder '/'  begin num2str(T1) '.jpg'])); 
+    Frame(:,:,1)=rgb2gray(imread(['../Database/Week02/' Fold '/' VideoInFolder '/'  begin num2str(T1) '.jpg'])); 
+    Frame(:,:,2)=rgb2gray(imread(['../Database/Week02/' Fold '/' VideoInFolder '/'  begin num2str(T1) '.jpg'])); 
+    Frame(:,:,3)=rgb2gray(imread(['../Database/Week02/' Fold '/' VideoInFolder '/'  begin num2str(T1) '.jpg'])); 
     
 [H,W,C]=size(Frame);
 Frame=double(reshape(Frame,H*W,C));
@@ -71,9 +71,9 @@ for t=T1:T2
         end
    end
     Frame=zeros(H,W,C);
-    Frame(:,:,1)=rgb2gray(imread(['./' Fold '/' VideoInFolder '/'  begin num2str(t) '.jpg'])); 
-    Frame(:,:,2)=rgb2gray(imread(['./' Fold '/' VideoInFolder '/'  begin num2str(t) '.jpg'])); 
-    Frame(:,:,3)=rgb2gray(imread(['./' Fold '/' VideoInFolder '/'  begin num2str(t) '.jpg'])); 
+    Frame(:,:,1)=rgb2gray(imread(['../Database/Week02/' Fold '/' VideoInFolder '/'  begin num2str(t) '.jpg'])); 
+    Frame(:,:,2)=rgb2gray(imread(['../Database/Week02/' Fold '/' VideoInFolder '/'  begin num2str(t) '.jpg'])); 
+    Frame(:,:,3)=rgb2gray(imread(['../Database/Week02/' Fold '/' VideoInFolder '/'  begin num2str(t) '.jpg'])); 
     
     Frame1D=double(reshape(Frame,H*W,3));    
     % Update of mixture model
