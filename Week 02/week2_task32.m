@@ -4,8 +4,8 @@
 addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
-directory_sequence = '../Database/Week02/highway/';
-%directory_sequence = '../Database/Week02/fall/';
+%directory_sequence = '../Database/Week02/highway/';
+directory_sequence = '../Database/Week02/fall/';
 %directory_sequence = '../Database/Week02/traffic/';
 
 directory_imagesIn = strcat(directory_sequence, 'input/');
@@ -29,19 +29,19 @@ if strcmp(directory_sequence,'../Database/Week02/highway/')
     T2 = 1350;
     video='highway';
     
-    K = 5
-    Rho = 0.0725
-    Threshold = 5.5
-    THFG = 0.642
+    K = 4 
+    Rho = 0.0417
+    Threshold = 2.8450 
+    THFG = 0.358
 elseif strcmp(directory_sequence,'../Database/Week02/fall/')
     T1 = 1460;
     T2 = 1560;
     video='fall';
     
-    K = 5;
-    Rho = 0.07568;
-    Threshold = 4.5;
-    THFG = 0.568;
+    K = 3;
+    Rho = 0.0268
+    Threshold = 5.275
+    THFG = 0.7501
 else
     T1 = 950;
     T2 = 1050;
@@ -63,7 +63,7 @@ end
 
 
 
-filename = 'Video_highway.gif';
+filename = 'Video_fall.gif';
 
 [Sequence] = MultG_fun(Threshold,T1,T2,K,Rho,THFG,video);
     
