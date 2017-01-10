@@ -8,6 +8,7 @@ Task 1: Gaussian distribution
 
 
 Task 2: Adaptative modelling
+
 Input parameters: aplha, rho and the sequence used (either highway, fall or traffic)
 
 It computes foreground detection on the selected sequence using adaptative modelling.
