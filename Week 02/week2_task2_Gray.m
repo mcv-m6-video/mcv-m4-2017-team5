@@ -73,15 +73,18 @@ seq = strsplit(sequence, '/');
 name_file = strcat(directory_write_grid, 'Grid_search/', seq{1},'_grid_alpha_rho.mat' );
 save(name_file, 'metrics_search', 'alphas', 'rhos')
 %%
-name_file = strcat(directory_write, 'Grid_search/', sequence,'grid_alpha_rho.mat' );
+seq = strsplit(sequence, '/');
+name_file = strcat(directory_write_grid, 'Grid_search/', seq{1},'_grid_alpha_rho.mat' );
 load(name_file)
 precision = shiftdim(metrics_search(:, :, 1));
 recall = shiftdim(metrics_search(:, :, 2));
 fmeasure = shiftdim(metrics_search(:, :, 3));
 [Alpha, Rho] = meshgrid(rhos, alphas);
-figure, surf(Alpha, Rho, precision)
-figure, surf(Alpha, Rho, recall)
-figure, surf(Alpha, Rho, fmeasure)
+%Plot surfaces
+figure('units','normalized','outerposition',[0 0 1 1]), surf(Alpha, Rho, precision)
+axis square
+% figure, surf(Alpha, Rho, recall)
+% figure, surf(Alpha, Rho, fmeasure)
 
 %%
 max_fm_idx = find(fmeasure == (max(max(fmeasure))));
