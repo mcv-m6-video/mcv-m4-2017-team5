@@ -1,6 +1,9 @@
 # mcv-m4-2017-team5
 
 WEEK 2
+
+(directory /Week02/)
+
 This week work performs foreground detection for the sequences that are placed at the /Database/Week02/ directory (highway, fall and traffic)
 
 
