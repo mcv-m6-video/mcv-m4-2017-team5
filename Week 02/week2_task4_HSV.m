@@ -5,15 +5,27 @@ addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
 
-directory_imagesIn = 'Database/highway/input/';
-directory_imagesGT = 'Database/highway/groundtruth/';
+%Directory where the masks of the different sets are placed
+%directory_sequence = '../Database/Week02/highway/';
+directory_sequence = '../Database/Week02/fall/';
+%directory_sequence = '../Database/Week02/traffic/';
 
+directory_imagesIn = strcat(directory_sequence, 'input/');
 dirIn = dir([directory_imagesIn '/*.jpg']);
+ext='.jpg';
+directory_imagesGT = strcat(directory_sequence, 'groundtruth/');
 dirGT = dir([directory_imagesGT '/*.png']);
 
-images1 = zeros(240,320,3,100);
-images2 = zeros(240,320,3,100);
-imagesSeg = zeros(240,320,100);
+[dim1, dim2, dim3] = size(imread(strcat(directory_imagesIn, dirIn(1).name)));
+imagesSeg = zeros(dim1, dim2, length(dirIn));
+
+percentage = 0.5;
+train = 1:floor(percentage*length(dirIn));
+test = floor(percentage*length(dirIn)) + 1:length(dirIn);
+
+images1 = zeros(dim1, dim2, dim3,length(train));
+images2 = zeros(dim1, dim2, dim3,length(test));
+imagesSeg = zeros(dim1, dim2,length(test));
  alpha=0.088;
 %0.001 muy sobresegmentado. 0.01 sobresegmentado 0.05 bien, probar cerca.
 
@@ -25,12 +37,12 @@ for i = 1:length(dirIn)/2
 end
 
 
-mu = zeros(240,320,3);
-sigma = zeros(240,320,3);
+mu = zeros(dim1,dim2,dim3);
+sigma = zeros(dim1,dim2,dim3);
 
-for m = 1:240
-    for n = 1:320
-        for k = 1:3
+for m = 1:dim1
+    for n = 1:dim2
+        for k = 1:dim3
             mu(m,n,k)=mean(images1(m,n,k,:));
             sigma(m,n,k)=std(images1(m,n,k,:)); 
         end
@@ -39,7 +51,9 @@ end
 
 %For the second 50% of the images from the dataset, the foreground is
 %segmented
-%for alpha = 0.001:0.001:0.2
+step=0;
+for alpha = 0.01:0.01:0.2
+    step=step+1;
 for i = length(dirIn)/2+1:length(dirIn)
     images2(:,:,:,i-length(dirIn)/2) = rgb2hsv(im2double(imread(dirIn(i).name)));
     imagesSeg(:,:,i-length(dirIn)/2) = ...
@@ -52,33 +66,34 @@ end
 
 %Evaluation step
 
-    TP_images = zeros(length(dirGT), 1);
-    FP_images = zeros(length(dirGT), 1);
-    FN_images = zeros(length(dirGT), 1);
-    TN_images = zeros(length(dirGT), 1);
+    TP_images = zeros(length(test), 1);
+    FP_images = zeros(length(test), 1);
+    FN_images = zeros(length(test), 1);
+    TN_images = zeros(length(test), 1);
  
 
- for i = length(dirIn)/2+1:length(dirIn)
+ for i = test
         
         imageGT =imread(strcat(directory_imagesGT,dirGT(i).name));
-        image = imagesSeg(:,:,i-length(dirIn)/2);
+        image = imagesSeg(:,:,i-length(test)+1);
         [pixelTP, pixelFP, pixelFN, pixelTN] = PerformanceAccumulationPixel(image, imageGT);
-        TP_images(i) = pixelTP;
-        FP_images(i) = pixelFP;
-        FN_images(i) = pixelFN;
-        TN_images(i) = pixelTN;
+        TP_images(i-length(test)+1) = pixelTP;
+        FP_images(i-length(test)+1) = pixelFP;
+        FN_images(i-length(test)+1) = pixelFN;
+        TN_images(i-length(test)+1) = pixelTN;
         
  end
     [pixelTP,pixelFP,pixelFN,pixelTN,pixelPrecision, pixelRecall,pixelFMeasure] = PerformanceEvaluationPixel(TP_images, FP_images, FN_images, TN_images);
-    metrics = [pixelTP,pixelFP,pixelFN,pixelTN];
-    metrics2 = [pixelPrecision, pixelRecall,pixelFMeasure];
+%     metrics = [pixelTP,pixelFP,pixelFN,pixelTN];
+%     metrics2 = [pixelPrecision, pixelRecall,pixelFMeasure];
     
  
  %Uncomment this lines so an analysis in relation to alpha is performed (remember to change the for sentence too)   
-%     metrics(:,uint8(alpha*1000)) = [pixelTP,pixelFP,pixelFN,pixelTN];
-%     metrics2(:,uint8(alpha*1000)) = [pixelPrecision, pixelRecall,pixelFMeasure];
-%end
-
+    metrics(:,uint8(step)) = [pixelTP,pixelFP,pixelFN,pixelTN];
+    metrics2(:,uint8(step)) = [pixelPrecision, pixelRecall,pixelFMeasure];
+end
+alpha= 0.01:0.01:0.2;
+auc = graphs(alpha,metrics,metrics2)
 % plot(alpha,metrics2(1,:),'r',alpha,metrics2(2,:),'g',alpha,metrics2(3,:),'b');
 % title 'Precision Recall Fmeasure'
 % xlabel('Alpha')
