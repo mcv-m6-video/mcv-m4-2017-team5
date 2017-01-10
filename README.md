@@ -12,6 +12,7 @@ Input parameters: Sequence used (either highway, fall or traffic)
 
 It computes foreground detection on the selected sequence using Gaussian modelling for several values of alpha. The evaluation is performed computing performance metrics as well as  Precision-Recall and ROC curves.
 
+
 Task 2: Adaptative modelling
 
 week2_task2_Gray.m
@@ -26,9 +27,17 @@ A video is also generated to compare these results with the task 1 ones.
 
 Task 3:
 
+week2_task32.m
+
+Input parameters: Sequence used (either highway, fall or traffic)
+
+It compares results from previous single gaussian methods with the foreground segmentation results of applying a GMM model. 
+
 
 Task 4: Color extension
 
 week2_task4_HSV.m and week2_task4_RGB.m
+
+Input parameters: Sequence used (either highway, fall or traffic)
 
 This task does the same as task 1 but using color sequences (on HSV and RGB colour spaces) instead of using gray scale ones.
