@@ -95,8 +95,9 @@ end
 alpha= 0.01:0.01:0.1;
 auc = graphs(alpha,metrics,metrics2)
 %     x = ['highway','fall','traffic'];
-%traffic=0.4372 0.4714
+%traffic=0.4372(auc) 0.4714
 %highway=0.5332 0.5768
+%fall = 0.3943
 %     y=[0.6735  ;0.4437 ;0.6311]
  
 % plot(alpha,metrics2(1,:),'r',alpha,metrics2(2,:),'g',alpha,metrics2(3,:),'b');
