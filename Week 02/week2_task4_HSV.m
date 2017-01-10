@@ -32,8 +32,8 @@ imagesSeg = zeros(dim1, dim2,length(test));
 %For the first 50% of the images from the dataset, the background model is
 %computed.
 
-for i = 1:length(dirIn)/2
-    images1(:,:,:,i) = rgb2hsv(im2double(imread(dirIn(i).name)));
+for i =train
+    images1(:,:,:,i) = rgb2hsv(im2double(imread(strcat(directory_imagesIn, dirIn(i).name))));
 end
 
 
@@ -52,14 +52,14 @@ end
 %For the second 50% of the images from the dataset, the foreground is
 %segmented
 step=0;
-for alpha = 0.01:0.01:0.2
+for alpha= 0.01:0.01:0.1;
     step=step+1;
-for i = length(dirIn)/2+1:length(dirIn)
-    images2(:,:,:,i-length(dirIn)/2) = rgb2hsv(im2double(imread(dirIn(i).name)));
-    imagesSeg(:,:,i-length(dirIn)/2) = ...
-        abs(images2(:,:,1,i-length(dirIn)/2)-mu(:,:,1)) >= alpha*(2+sigma(:,:,1)) &...
-        abs(images2(:,:,2,i-length(dirIn)/2)-mu(:,:,2)) >= alpha*(2+sigma(:,:,2)) &...
-        abs(images2(:,:,3,i-length(dirIn)/2)-mu(:,:,3)) >= alpha*(2+sigma(:,:,3));
+for i = test
+    images2(:,:,:,i-length(test)+1) = rgb2hsv(im2double(imread(strcat(directory_imagesIn, dirIn(i).name))));
+    imagesSeg(:,:,i-length(test)+1) = ...
+        abs(images2(:,:,1,i-length(test)+1)-mu(:,:,1)) >= alpha*(2+sigma(:,:,1)) &...
+        abs(images2(:,:,2,i-length(test)+1)-mu(:,:,2)) >= alpha*(2+sigma(:,:,2)) &...
+        abs(images2(:,:,3,i-length(test)+1)-mu(:,:,3)) >= alpha*(2+sigma(:,:,3));
 end
 
 %% 
@@ -92,8 +92,13 @@ end
     metrics(:,uint8(step)) = [pixelTP,pixelFP,pixelFN,pixelTN];
     metrics2(:,uint8(step)) = [pixelPrecision, pixelRecall,pixelFMeasure];
 end
-alpha= 0.01:0.01:0.2;
+alpha= 0.01:0.01:0.1;
 auc = graphs(alpha,metrics,metrics2)
+%     x = ['highway','fall','traffic'];
+%traffic=0.4372 0.4714
+%highway=0.5332 0.5768
+%     y=[0.6735  ;0.4437 ;0.6311]
+ 
 % plot(alpha,metrics2(1,:),'r',alpha,metrics2(2,:),'g',alpha,metrics2(3,:),'b');
 % title 'Precision Recall Fmeasure'
 % xlabel('Alpha')
