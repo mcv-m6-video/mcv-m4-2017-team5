@@ -4,8 +4,8 @@ clc
 addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
-% sequence = 'highway/';
-sequence = 'fall/';
+sequence = 'highway/';
+% sequence = 'fall/';
 % sequence = 'traffic/';
 
 directory_sequence = strcat('../Database/Week02/', sequence);
@@ -21,23 +21,23 @@ param  = compute_parameters_w2(directory_sequence, directory_write, alpha, rho, 
 
 %%
 %Computation_step
-imagesSeg = recursive_gaussian( param );
+% imagesSeg = recursive_gaussian( param );
 
 %Evaluation step
-[ ~, metrics2 ] = evaluate_model_adaptive( imagesSeg, param );
+% [ ~, metrics2 ] = evaluate_model_adaptive( imagesSeg, param );
 
 
 
 %%
 %Grid search
 min_alpha = 0.001;
-step_alpha = 0.05;
-max_alpha = 1;
+step_alpha = 0.5;
+max_alpha = 10;
 alphas = min_alpha:step_alpha:max_alpha;
 
 min_rho = 0;
-step_rho = 0;   
-max_rho = 0;
+step_rho = 0.1;   
+max_rho = 1;
 rhos = min_rho:step_rho:max_rho;
 
 
@@ -70,7 +70,7 @@ for j = 1:dim2
     end
 end
 seq = strsplit(sequence, '/');
-name_file = strcat(directory_write_grid, 'Grid_search/', seq{1},'_grid_alpha_rho.mat' );
+name_file = strcat(directory_write_grid, 'Grid_search/', seq{1},'_grid_alpha_rho_new.mat' );
 save(name_file, 'metrics_search', 'alphas', 'rhos')
 %%
 seq = strsplit(sequence, '/');
@@ -79,19 +79,39 @@ load(name_file)
 precision = shiftdim(metrics_search(:, :, 1));
 recall = shiftdim(metrics_search(:, :, 2));
 fmeasure = shiftdim(metrics_search(:, :, 3));
-[Alpha, Rho] = meshgrid(rhos, alphas);
+[Rho, Alpha] = meshgrid(rhos, alphas);
 %Plot surfaces
-figure('units','normalized','outerposition',[0 0 1 1]), surf(Alpha, Rho, precision)
-axis square
-% figure, surf(Alpha, Rho, recall)
-% figure, surf(Alpha, Rho, fmeasure)
+% figure('units','normalized','outerposition',[0 0 1 1]), surf(Alpha, Rho, precision)
 
+%  figure, surf(Alpha, Rho, recall)
+
+max_fm_idx = find(fmeasure == (max(max(fmeasure))));
+[i_max, j_max] = ind2sub(size(fmeasure), max_fm_idx);
+% max_fm = fmeasure(i_max, j_max);
+figure('units','normalized','outerposition',[0 0 1 1]),
+surf( Rho, Alpha, fmeasure)
+hold on
+s = 150;
+scatter3( rhos(j_max),alphas(i_max),fmeasure(i_max, j_max),s, 'filled')
+text(rhos(j_max),alphas(i_max),fmeasure(i_max, j_max) + 0.05, ...
+    strcat('Maximum value of F-measure:   ', num2str(fmeasure(i_max, j_max))),...
+    'FontWeight', 'bold')
+
+xlabel('Rho','FontWeight', 'bold')
+ylabel('Alpha','FontWeight', 'bold')
+zlabel('F-measure','FontWeight', 'bold')
+title('Exhaustive search of F-measure ','FontWeight', 'bold')
+
+colorbar
 %%
 max_fm_idx = find(fmeasure == (max(max(fmeasure))));
 
 
-[i_max, j_max] = ind2sub(size(fmeasure), max_fm);
+[i_max, j_max] = ind2sub(size(fmeasure), max_fm_idx);
+
+
 max_fm = fmeasure(i_max, j_max);
+[max_fm, alphas(i_max), rhos(j_max)]
 % pixelPrecision, pixelRecall, pixelFMeasure]
 % plot( shiftdim(metrics_search(1, 1, :)),shiftdim(metrics_search(1, 2, :)), 'r')
 % %, alphas, shiftdim(metrics_search(1, 2,:)), 'g', alphas, shiftdim(metrics_search(1, 3,:)), 'b');
@@ -99,3 +119,21 @@ max_fm = fmeasure(i_max, j_max);
 % xlabel('Alpha')
 % ylabel('Value')
 % legend('Precision','Recall','Fmeasure')
+
+
+%%
+% plot(alpha,metrics2(1,:),'r',alpha,metrics2(2,:),'g',alpha,metrics2(3,:),'b');
+% title 'Precision Recall Fmeasure'
+% xlabel('Alpha')
+% ylabel('Value')
+% legend('Precision','Recall','Fmeasure')
+% figure,
+% plot(metrics2(2,:),metrics2(1,:))
+% title 'Precision Recall curve'
+% xlabel('Recall')
+% ylabel('Precision')
+% figure,
+% plot((metrics(2,:)./(metrics(2,:)+metrics(4,:))),metrics(1,:)./(metrics(1,:)+metrics(3,:)))
+% title 'ROC curve'
+% xlabel('FP ratio')
+% ylabel('TP ratio')
