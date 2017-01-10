@@ -2,12 +2,12 @@ clear all
 close all
 clc
 addpath(genpath('.'))
-
+tic
 %Directory where the masks of the different sets are placed
 
-% directory_sequence = '../Database/Week02/highway/';
+ directory_sequence = '../Database/Week02/highway/';
 % directory_sequence = '../Database/Week02/fall/';
-directory_sequence = '../Database/Week02/traffic/';
+%directory_sequence = '../Database/Week02/traffic/';
 
 directory_imagesIn = strcat(directory_sequence, 'input/');
 directory_imagesGT = strcat(directory_sequence, 'groundtruth/');
@@ -50,10 +50,11 @@ for m = 1:dim1
       
     end
 end
+toc
 
 %For the second 50% of the images from the dataset, the foreground is
 %segmented
-%  for alpha = 0.001:0.001:0.2
+for alpha = 0.01:0.01:0.2
 for i = test
     images_test(:,:,i-length(test)+1) = rgb2gray(im2double(imread(strcat(directory_imagesIn,dirIn(i).name))));
     imagesSeg(:,:,i-length(test)+1) = abs(images_test(:,:,i-length(test)+1)-mu(:,:)) >= alpha*(2+sigma(:,:));
@@ -75,24 +76,34 @@ end
         imageGT =imread(strcat(directory_imagesGT,dirGT(i).name));
         image = imagesSeg(:,:,i-length(test)+1);
         [pixelTP, pixelFP, pixelFN, pixelTN] = PerformanceAccumulationPixel(image, imageGT);
-        TP_images(i) = pixelTP;
-        FP_images(i) = pixelFP;
-        FN_images(i) = pixelFN;
-        TN_images(i) = pixelTN;
+        TP_images(i-length(test)+1) = pixelTP;
+        FP_images(i-length(test)+1) = pixelFP;
+        FN_images(i-length(test)+1) = pixelFN;
+        TN_images(i-length(test)+1) = pixelTN;
         
  end
     [pixelTP,pixelFP,pixelFN,pixelTN,pixelPrecision, pixelRecall,pixelFMeasure] = PerformanceEvaluationPixel(TP_images, FP_images, FN_images, TN_images);
-    metrics = [pixelTP,pixelFP,pixelFN,pixelTN];
-    metrics2 = [pixelPrecision, pixelRecall,pixelFMeasure];
-    
+%     metrics = [pixelTP,pixelFP,pixelFN,pixelTN];
+%     metrics2 = [pixelPrecision, pixelRecall,pixelFMeasure];
+%     disp('termina')
  
-%  %Uncomment this lines so an analysis in relation to alpha is performed (remember to change the for sentence too)   
-%     metrics(:,uint8(alpha*1000)) = [pixelTP,pixelFP,pixelFN,pixelTN];
-%     metrics2(:,uint8(alpha*1000)) = [pixelPrecision, pixelRecall,pixelFMeasure];
-% end
-% 
-% plot(alpha,metrics2(1,:),'r',alpha,metrics2(2,:),'g',alpha,metrics2(3,:),'b');
-% title 'Precision Recall Fmeasure'
-% xlabel('Alpha')
-% ylabel('Value')
-% legend('Precision','Recall','Fmeasure')
+ %Uncomment this lines so an analysis in relation to alpha is performed (remember to change the for sentence too)   
+    metrics(:,uint8(alpha*100)) = [pixelTP,pixelFP,pixelFN,pixelTN];
+    metrics2(:,uint8(alpha*100)) = [pixelPrecision, pixelRecall,pixelFMeasure];
+end
+alpha = 0.01:0.01:0.2;
+plot(alpha,metrics2(1,:),'r',alpha,metrics2(2,:),'g',alpha,metrics2(3,:),'b');
+title 'Precision Recall Fmeasure'
+xlabel('Alpha')
+ylabel('Value')
+legend('Precision','Recall','Fmeasure')
+figure,
+plot(metrics2(2,:),metrics2(1,:))
+title 'Precision Recall curve'
+xlabel('Recall')
+ylabel('Precision')
+figure,
+plot((metrics(2,:)./(metrics(2,:)+metrics(4,:))),metrics(1,:)./(metrics(1,:)+metrics(3,:)))
+title 'ROC curve'
+xlabel('FP ratio')
+ylabel('TP ratio')

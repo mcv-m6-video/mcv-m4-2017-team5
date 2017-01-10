@@ -13,7 +13,7 @@ directory_sequence = strcat('../Database/Week02/', sequence);
 directory_write = strcat('../Results/week2/', sequence);
 directory_write_grid = '../Results/week2/';
 alpha = 0.1510;
-rho = 0.0900;    
+rho = 0;    
 percentage = 0.5;
 
 param  = compute_parameters_w2(directory_sequence, directory_write, alpha, rho, percentage);
@@ -36,8 +36,8 @@ max_alpha = 1;
 alphas = min_alpha:step_alpha:max_alpha;
 
 min_rho = 0;
-step_rho = 0.01;   
-max_rho = 1;
+step_rho = 0;   
+max_rho = 0;
 rhos = min_rho:step_rho:max_rho;
 
 
