@@ -35,7 +35,7 @@ This week work performs foreground detection for the sequences that are placed a
 
  This task does the same as task 1 but using color sequences (on HSV and RGB colour spaces) instead of using gray scale ones.
 
- ## Contributors
+## Contributors
 
  * Idoia Ruiz ([idoiaruiz](https://github.com/idoiaruiz))
  * Roque Rodriguez ([RoqueRouteiral](https://github.com/RoqueRouteiral))
