@@ -13,13 +13,13 @@ function [ images_processed ] = morphological( images, process_type, plot )
         %images_processed: images after applying morphological operators.
         %Same syntaxis than the images parameter.
         
-%   Further considerations:
-        %Since the segmentation is strongly dependent on the parameters
-        %it is done with, two options are provided. One is done by the
-        %asumtion the image is very noisy (high recall) but with a good
-        %detection of the objects. Other is done assuming the image is not
-        %very noisy but the objects are quite empty and not well 
-        %detected(high precision).
+%   Further considerations:        
+        %Depending on the secuence one different processing must be
+        %performed. The process_type for each sequence would be:
+                %Traffic process_type = 2
+                %Highway process_type = 3
+                %Fall process_type = 4
+                %FillHoles is done by selecting process_type = 1.
         
 %   Default parameters:
         %If the number of input parameters given is just one (the images),
@@ -41,33 +41,54 @@ function [ images_processed ] = morphological( images, process_type, plot )
 
     %First, structural elements are created:
     se1 = strel('diamond',2);
-    se2 = strel('diamond',12);
-    se3 = strel('square',3);
+    se2 = strel('diamond',20);
+    se3 = strel('diamond',6);
     se4 = strel('line',10,45);
-    se5 = strel('line',15,45);
+    se5 = strel('diamond',7);
+    se6 = strel('diamond',3);
     
     %then, morphological operators are applied:
     switch process_type
         case 1
+            for i = 1:dim3
+               I = imfill(images(:,:,i),'holes');
+               images_pr(:,:,i)= I;
+            end   
+            
+        case 2
             for i = 1:dim3
                 I = imfill(images(:,:,i),'holes');
                 Icl = imopen(I,se4);
                 Iocl = imclose(Icl,se2);
                 images_pr(:,:,i)=Iocl;
             end
-            
-        case 2
+        case 3
             for i = 1:dim3
                I = imfill(images(:,:,i),'holes');
-               images_pr(:,:,i)= I;
+               Icl = imclose(I,se3);
+               Io = imopen(Icl,se1);
+               If = imfill(Io,'holes');
+               images_pr(:,:,i) = If;
+            end
+        case 4
+            for i = 1:dim3
+               I = imfill(images(:,:,i),'holes');
+               Io = imopen(I,se6);
+               Iof = imfill(Io,'holes');
+               Icl = imclose(Iof,se5);
+               Iclf = imfill(Icl,'holes');
+               images_pr(:,:,i) = Iclf;
             end
     end
+            
     
+    % For plotting the result
     if plot
     for k = 1:dim3
         imshow(images_pr(:,:,k));
     end
     end
+    
     images_processed = images_pr;
 end
 
