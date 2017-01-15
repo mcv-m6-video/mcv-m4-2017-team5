@@ -1,13 +1,11 @@
-function []=create_gift(image,foreground,foregroundfilled,foregroundprocessed,filename,i)
+function []=create_gift(image,foreground,foregroundfilled,filename,i)
 
-subplot(141);
+subplot(131);
 imshow(image);
-subplot(142),
+subplot(132),
 imshow(foreground,[]);
-subplot(143),
+subplot(133),
 imshow(foregroundfilled,[]);
-subplot(144),
-imshow(foregroundprocessed,[]);
 
 frame = getframe(gcf);
 im=frame2im(frame);
