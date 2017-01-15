@@ -4,9 +4,9 @@ clc
 addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
-% sequence = 'highway/';
-% sequence = 'fall/';
- sequence = 'traffic/';
+ sequence = 'highway/';
+%sequence = 'fall/';
+%sequence = 'traffic/';
 task = 2;
 cnn = 4;
 percentage = 0.5;
@@ -15,7 +15,7 @@ switch task
     case 1 
         process_type = 1;
         intervalpha = 0:0.05:0.3;
-         switch sequence
+        switch sequence
             case 'highway/'
                 alpha = 0.101;
                 rho = 0.04;
@@ -28,7 +28,7 @@ switch task
                 alpha = 0.151;
                 rho = 0.09;
              
-         end
+        end
         directory_sequence = strcat('../Database/Week02/', sequence);
         directory_write = strcat('../Results/week3/', sequence);
         contador = 0; 
@@ -62,22 +62,25 @@ switch task
                 rho = 0.09;
                 Pinter=0:5:30;
         end
+        
         directory_sequence = strcat('../Database/Week02/', sequence);
         directory_write = strcat('../Results/week3/', sequence);
+       
         for P = Pinter
-        contador = 0; 
-        for alpha = intervalpha
-                contador = contador + 1;
-                param  = compute_parameters_w3(directory_sequence, directory_write, alpha, rho, percentage);
-                %Computation_step
-                imagesSeg = recursive_gaussian( param );
-                %Morphological step
-                imagesSegMorph = morphological(imagesSeg,process_type);
-                %Evaluation step
-                [ metrics(:,contador), metrics2(:,contador) ] = evaluate_model_adaptive( imagesSegMorph, param );
-         end
-         auc = areaundercurve(metrics2(2,:),metrics2(1,:));
-         Results = [P auc;Results];
+            contador = 0; 
+
+            for alpha = intervalpha
+                    contador = contador + 1;
+                    param  = compute_parameters_w3(directory_sequence, directory_write, alpha, rho, percentage);
+                    %Computation_step
+                    imagesSeg = recursive_gaussian( param );
+                    %Morphological step
+                    imagesSegMorph = morphological(imagesSeg,process_type, P);
+                    %Evaluation step
+                    [ metrics(:,contador), metrics2(:,contador) ] = evaluate_model_adaptive( imagesSegMorph, param );
+             end
+             auc = areaundercurve(metrics2(2,:),metrics2(1,:));
+             Results = [P auc;Results];
          end
          
     case 3
@@ -102,9 +105,6 @@ switch task
         directory_write = strcat('../Results/week3/', sequence);
 
         param  = compute_parameters_w3(directory_sequence, directory_write, alpha, rho, percentage);
-
-
-        %%
         %Computation_step
         imagesSeg = recursive_gaussian( param );
         %Morphological step
