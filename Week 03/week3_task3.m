@@ -45,7 +45,7 @@ switch task
         contador = 0; 
         for alpha = intervalpha
                 contador = contador + 1;
-                param  = compute_parameters_w3(directory_sequence, directory_write, alpha, rho, percentage);
+                param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage);
                 %Computation_step
                 imagesSeg = recursive_gaussian( param );
                 %Morphological step
@@ -82,7 +82,7 @@ switch task
 
             for alpha = intervalpha
                     contador = contador + 1;
-                    param  = compute_parameters_w3(directory_sequence, directory_write, alpha, rho, percentage);
+                    param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage);
                     %Computation_step
                     imagesSeg = recursive_gaussian( param );
                     %Morphological step
