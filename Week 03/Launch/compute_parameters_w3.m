@@ -1,4 +1,6 @@
-function params  = compute_parameters_w3(directory_sequence, directory_write, alpha, rho, percentage)
+function params  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage)
+
+directory_sequence = strcat('../Database/Week02/', sequence);
 params.directory_imagesIn = strcat(directory_sequence, 'input/');
 params.directory_imagesGT = strcat(directory_sequence, 'groundtruth/');
 

@@ -30,7 +30,7 @@ directory_write_grid = '../Results/week3/';
 % rho = 0.04;
 percentage = 0.5;
 
-param  = compute_parameters_w3(directory_sequence, directory_write, alpha, rho, percentage);
+param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage);
 
 
 %%

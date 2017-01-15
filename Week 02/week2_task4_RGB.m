@@ -26,7 +26,7 @@ test = floor(percentage*length(dirIn)) + 1:length(dirIn);
 images1 = zeros(dim1, dim2, dim3,length(train));
 images2 = zeros(dim1, dim2, dim3,length(test));
 imagesSeg = zeros(dim1, dim2,length(test));
- alpha=0.088;
+alpha=0.088;
 %0.001 muy sobresegmentado. 0.01 sobresegmentado 0.05 bien, probar cerca.
 
 %For the first 50% of the images from the dataset, the background model is

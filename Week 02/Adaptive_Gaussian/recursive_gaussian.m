@@ -21,7 +21,7 @@ end
 %For the first 50% of the images from the dataset, the background model is
 %trained.
 mu = mean(images_train, 3);
-sigma = std(images_train, 0, 3);
+sigma = std(images_train, 1, 3);
 
 
 %For the second 50% of the images from the dataset, the foreground is
@@ -37,7 +37,8 @@ for i = 1:length(test)
     
     %Update background model with pixels labeled as background
     mu = (1 - segmentation).*(param.rho*im + (1 - param.rho)*mu) + segmentation.*mu;
-    sigma = sqrt((1 - segmentation).*(param.rho*(im - mu).^2 + (1 - param.rho)*sigma.^2) + segmentation.*sigma.^2);
+    sigma = sqrt((1 - segmentation).*(param.rho.*(im - mu).^2 + (1 - param.rho).*sigma.^2) + segmentation.*sigma.^2);
+    
 end
 end
 
