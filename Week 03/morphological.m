@@ -1,4 +1,4 @@
-function [ images_processed ] = morphological( images, process_type, plot )
+function [ images_processed ] = morphological( images, process_type, P , cnn ,plot )
 %morphological. This function applies morphological operators to the
 %foreground segmentation so such segmentation is improved. In order to do
 %that, noise is intended to be removed and holes on the detected objects
@@ -16,10 +16,12 @@ function [ images_processed ] = morphological( images, process_type, plot )
 %   Further considerations:        
         %Depending on the secuence one different processing must be
         %performed. The process_type for each sequence would be:
-                %Traffic process_type = 2
+                %Task 1 process_type = 1
+                %Task 2 process_type = 2
                 %Highway process_type = 3
                 %Fall process_type = 4
-                %FillHoles is done by selecting process_type = 1.
+                %Traffic process_type = 5
+
         
 %   Default parameters:
         %If the number of input parameters given is just one (the images),
@@ -29,11 +31,18 @@ function [ images_processed ] = morphological( images, process_type, plot )
         
     if nargin < 2
         process_type = 1;
-        plot = true;
-    end
-    
-    if nargin == 2
-        plot = true;
+        cnn = 4;
+        P = 30;
+        plot = false;
+    elseif nargin < 3
+        cnn = 4;
+        P = 30;
+        plot = false;
+    elseif nargin < 4
+        cnn = 4;
+        plot = false;
+    elseif nargin == 4 
+        plot = false;
     end
     close all
     [dim1,dim2,dim3] = size(images);
@@ -51,33 +60,42 @@ function [ images_processed ] = morphological( images, process_type, plot )
     switch process_type
         case 1
             for i = 1:dim3
-               I = imfill(images(:,:,i),'holes');
+               I = imfill(images(:,:,i),cnn,'holes');
                images_pr(:,:,i)= I;
             end   
             
         case 2
             for i = 1:dim3
-                I = imfill(images(:,:,i),'holes');
-                Icl = imopen(I,se4);
-                Iocl = imclose(Icl,se2);
-                images_pr(:,:,i)=Iocl;
+               I = imfill(images(:,:,i),cnn,'holes');
+               Iarea = bwareaopen(I,P,cnn);
+               images_pr(:,:,i)= Iarea;
             end
         case 3
             for i = 1:dim3
-               I = imfill(images(:,:,i),'holes');
-               Icl = imclose(I,se3);
+               I = imfill(images(:,:,i),cnn,'holes');
+               Iarea = bwareaopen(I,P,cnn);
+               Icl = imclose(Iarea,se3);
                Io = imopen(Icl,se1);
                If = imfill(Io,'holes');
                images_pr(:,:,i) = If;
             end
         case 4
             for i = 1:dim3
-               I = imfill(images(:,:,i),'holes');
-               Io = imopen(I,se6);
+               I = imfill(images(:,:,i),cnn,'holes');
+               Iarea = bwareaopen(I,P,cnn);
+               Io = imopen(Iarea,se6);
                Iof = imfill(Io,'holes');
                Icl = imclose(Iof,se5);
                Iclf = imfill(Icl,'holes');
                images_pr(:,:,i) = Iclf;
+            end
+        case 5 
+            for i = 1:dim3
+                I = imfill(images(:,:,i),cnn,'holes');
+                Iarea = bwareaopen(I,P,cnn);
+                Icl = imopen(Iarea,se4);
+                Iocl = imclose(Icl,se2);
+                images_pr(:,:,i)=Iocl;
             end
     end
             

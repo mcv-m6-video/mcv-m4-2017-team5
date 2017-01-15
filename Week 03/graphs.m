@@ -1,14 +1,23 @@
-function auc = graphs(Results)
-
-Results(isnan(Results))=0;
-
-hold on
-plot(Results(:,3),Results(:,2))
+function [auc] = graphs(alpha,metrics,metrics2)
+% 
+% plot(alpha,metrics2(1,:),'r',alpha,metrics2(2,:),'g',alpha,metrics2(3,:),'b');
+% title 'Precision Recall Fmeasure'
+% xlabel('Alpha')
+% ylabel('Value')
+% legend('Precision','Recall','Fmeasure')
+% figure,
+plot(metrics2(2,:),metrics2(1,:))
 title 'Precision Recall curve'
 xlabel('Recall')
 ylabel('Precision')
-%auc1 = areaundercurve(Results(:,3),Results(:,2));
-auc=trapz(Results(:,3),Results(:,2));
+auc = areaundercurve(metrics2(2,:),metrics2(1,:))
+% figure,
+% plot((metrics(2,:)./(metrics(2,:)+metrics(4,:))),metrics(1,:)./(metrics(1,:)+metrics(3,:)))
+% title 'ROC curve'
+% xlabel('FP ratio')
+% ylabel('TP ratio')
+
+
 end
 % fm1 = metrics when fall
 % and so on
