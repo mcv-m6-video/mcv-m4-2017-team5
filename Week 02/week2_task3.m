@@ -4,9 +4,9 @@
 addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
-%directory_sequence = '../Database/Week02/highway/';
+directory_sequence = '../Database/Week02/highway/';
 %directory_sequence = '../Database/Week02/fall/';
-directory_sequence = '../Database/Week02/traffic/';
+%directory_sequence = '../Database/Week02/traffic/';
 
 directory_imagesIn = strcat(directory_sequence, 'input/');
 dirIn = dir([directory_imagesIn '/*.jpg']);
@@ -36,9 +36,8 @@ FP_images = zeros(length(dirIn), 1);
 FN_images = zeros(length(dirIn), 1);
 TN_images = zeros(length(dirIn), 1);
 
-filename = strcat('Video_',video,'.gif');
 
-for k=2:6
+for k=3:6
     for LearningRate=0.001:0.001:0.1
         for BackgroundRatio=0:0.1:1
             detector=vision.ForegroundDetector('NumTrainingFrames',(FinalFrame-InitialFrame)./2, 'LearningRate',LearningRate,'MinimumBackgroundRatio',BackgroundRatio,'NumGaussians',k,'InitialVariance',30^2);
@@ -52,7 +51,6 @@ for k=2:6
 
                 [TP_images,FP_images,FN_images,TN_images] = Metrics(imageGT,foreground,i,TP_images,FP_images,FN_images,TN_images);
 
-                %create_gift(image,foreground,filename);
             end
 
             [pixelTP,pixelFP,pixelFN,pixelTN,pixelPrecision, pixelRecall,pixelFMeasure] = PerformanceEvaluationPixel(TP_images, FP_images, FN_images, TN_images);
