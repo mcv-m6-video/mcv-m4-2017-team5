@@ -35,6 +35,14 @@ This week work performs foreground detection for the sequences that are placed a
 
  This task does the same as task 1 but using color sequences (on HSV and RGB colour spaces) instead of using gray scale ones.
 
+
+## [WEEK 3](Week%2003/)
+
+
+- [Task 5: Final evaluation](Week%2003/week3_task5.m)
+
+ For each sequence after the processing done in the previous tasks, this task plots the Precision-Recall curves for a range of alpha values, and computes the AUC.
+
 ## Contributors
 
  * Idoia Ruiz ([idoiaruiz](https://github.com/idoiaruiz))
