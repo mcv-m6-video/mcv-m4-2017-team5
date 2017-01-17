@@ -44,7 +44,7 @@ function [ images_processed ] = morphological( images, process_type, P , cnn ,pl
     elseif nargin == 4 
         plot = false;
     end
-    close all
+    
     [dim1,dim2,dim3] = size(images);
     images_pr = zeros(dim1,dim2,dim3);
 
