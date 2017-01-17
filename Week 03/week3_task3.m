@@ -10,8 +10,8 @@ addpath(genpath('.'))
 task = 2;
 cnn = 4;
 percentage = 0.5;
-
-% param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage);
+thre_texture = 0;
+% param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage, thre_texture);
 
 
 %%
@@ -45,7 +45,7 @@ switch task
         contador = 0; 
         for alpha = intervalpha
                 contador = contador + 1;
-                param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage);
+                param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage, thre_texture);
                 %Computation_step
                 imagesSeg = recursive_gaussian( param );
                 %Morphological step
@@ -82,7 +82,7 @@ switch task
 
             for alpha = intervalpha
                     contador = contador + 1;
-                    param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage);
+                    param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage, thre_texture);
                     %Computation_step
                     imagesSeg = recursive_gaussian( param );
                     %Morphological step
@@ -115,7 +115,7 @@ switch task
         directory_sequence = strcat('../Database/Week02/', sequence);
         directory_write = strcat('../Results/week3/', sequence);
 
-        param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage);
+        param  = compute_parameters_w3(sequence, directory_write, alpha, rho, percentage, thre_texture);
         %Computation_step
         imagesSeg = recursive_gaussian( param );
         %Morphological step
