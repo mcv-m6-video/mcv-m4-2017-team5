@@ -20,18 +20,6 @@ for i = 1:length(test)
     
     CD = sqrt(sum((foreground_points - background_model.*cat(3, BD, BD, BD)).^2, 3));
     
-    shadows_color(:, :, i) = and(CD < 15, and (BD > 0.5, BD < 1));
+    shadows_color(:, :, i) = and(CD < 19, and (BD > 0.3, BD < 1));
 end    
 end
-% for i = 1:length(test)
-%     %Read image in color
-%     im = im2double(imread(strcat(param.directory_imagesIn, param.dirIn(test(i)).name)));
-%     %Take segmentation obtained from adaptive model
-%     segmentation = imagesSeg_final(:, :, i);
-%     %Determine foreground points
-%     foreground_points = im.* cat(3, segmentation, segmentation, segmentation);
-%     subplot(121)
-%     imshow(foreground_points)
-%     subplot(122)
-%     imshow(im)
-% end 
