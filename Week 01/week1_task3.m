@@ -1,9 +1,9 @@
 clear all; close all;
 addpath(genpath('.'))
 
-path_kitti = '../Database/Kitti/images/';
+path_kitti = '../Database/Week_01/Kitti/images/';
 path_results_given_kitti = '../Results_given_week01/results_opticalflow_kitti/LKflow_';
-path_ground_truth = '../Database/Kitti/gt_flow_nocc/';
+path_ground_truth = '../Database/Week_01/Kitti/gt_flow_nocc/';
 
 %List of images to read
 List_images = {'000045' '000157'};
@@ -15,7 +15,7 @@ for k = 1:length(List_images)
     Flow_est = flow_read(strcat(path_results_given_kitti, name_im));
     Flow_gt  = flow_read(strcat(path_ground_truth, name_im));
     
-    [MSE, PEPN] = flow_error (Flow_gt, Flow_est, tau);
+    [MSE, PEPN] = flow_error(Flow_gt, Flow_est, tau);
     
     Flow_err = flow_error_image(Flow_gt, Flow_est);
     
