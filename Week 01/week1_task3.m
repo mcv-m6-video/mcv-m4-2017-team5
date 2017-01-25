@@ -1,9 +1,9 @@
 clear all; close all;
 addpath(genpath('.'))
 
-path_kitti = '../Database/Week_01/Kitti/images/';
+path_kitti = '../Database/Week01/Kitti/images/';
 path_results_given_kitti = '../Results_given_week01/results_opticalflow_kitti/LKflow_';
-path_ground_truth = '../Database/Week_01/Kitti/gt_flow_nocc/';
+path_ground_truth = '../Database/Week01/Kitti/gt_flow_nocc/';
 
 %List of images to read
 List_images = {'000045' '000157'};
