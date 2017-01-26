@@ -23,9 +23,12 @@ for i = 1:N:ni
         N2 = min(j + N - 1, nj) - j;
         for k = max(i - P, 1):min(i + P, ni - N)
             for l = max(j - P, 1):min(j + P, nj - N)
+                
                 Block02 = Image_02(k:min(k + N1, ni), l:min(l + N2,nj));
                 Error(n, 1) = sum(sum(abs(Block01 - Block02)));
+                % Vertical movement of the full block
                 Error(n, 2) = k - i;
+                % Horizontal movement of the full block
                 Error(n, 3) = l - j;
                 n = n + 1;
             end
