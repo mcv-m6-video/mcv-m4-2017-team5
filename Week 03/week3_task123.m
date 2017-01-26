@@ -4,10 +4,10 @@ clc
 addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
- sequence = 'highway/';
+sequence = 'highway/';
 %sequence = 'fall/';
 %sequence = 'traffic/';
-task = 2;
+task = 3;
 cnn = 4;
 percentage = 0.5;
 thre_texture = 0;
