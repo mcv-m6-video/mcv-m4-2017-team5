@@ -1,4 +1,4 @@
-function []=create_gift(image,foreground,foregroundfilled,filename,i)
+function []=create_gif(image,foreground,foregroundfilled,filename,i)
 
 subplot(131);
 imshow(image);
