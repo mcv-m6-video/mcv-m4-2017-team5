@@ -28,9 +28,9 @@ for i = 2:length(frame_files)-1
     im = frame2im(frame);
     [imind, cm] = rgb2ind(im, 256);
     if i == 2
-        imwrite(imind,cm,'BMstab.gif','gif','DelayTime',0,'Loopcount',inf);
+        imwrite(imind,cm,[directory_results,filesep,'BMstab.gif'],'gif','DelayTime',0,'Loopcount',inf);
     else
-        imwrite(imind,cm,'BMstab.gif','gif','DelayTime',0,'WriteMode','append');
+        imwrite(imind,cm,[directory_results,filesep,'BMstab.gif'],'gif','DelayTime',0,'WriteMode','append');
     end
     
     %Compute optical flow
