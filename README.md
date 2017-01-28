@@ -38,12 +38,27 @@ This week work performs foreground detection for the sequences that are placed a
 
 ## [WEEK 3](Week%2003/)
 - [Task 1, 2, 3: Hole filling, area filtering and morphological operators](Week%2003/week3_task123.m)
+
  Performs the tasks 1, 2 and 3 of this week. There is a parameter named task which let choose the task to execute
+
 - [Task 4: Shadow removal](Week%2003/week3_task4.m)
+
  It performs the shadow removal algorithm based on (Xu, Landabaso, Pardàs, Shadow removal with blob-based morphological reconstruction for error correction, ICASSP 2005)
+
 - [Task 5: Final evaluation](Week%2003/week3_task5.m)
 
  For each sequence after the processing done in the previous tasks, this task plots the Precision-Recall curves for a range of alpha values, and computes the AUC.
+
+## [WEEK 4](Week%2004/)
+
+This week work performs optical flow estimation and video stabilization.
+
+- Task 2: Video stabilization using [block matching](Week%2004/week4_task2_1.m) and [alternative methods](Week%2004/week4_task2_2.m)
+
+  It uses the *traffic* sequence placed at the [/Database/Week02/traffic](Database/Week02/traffic/) directory
+
+  Video stabilization is performed using the block matching algorithm used in task 1, as well as using alternative approaches listed below:
+  - [Point feature matching](http://es.mathworks.com/help/vision/examples/video-stabilization-using-point-feature-matching.html)
 
 ## Contributors
 
