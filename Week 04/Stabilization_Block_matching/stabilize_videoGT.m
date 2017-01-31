@@ -10,18 +10,15 @@ function stabilize_videoGT(directory_sequence,directory_sequenceGT,directory_res
         frame_files = dir([directory_sequence '/*.png']);
     end
     
-    if isempty(frame_filesGT)
-        frame_filesGT = dir([directory_sequenceGT '/*.png']);
-    end
-    
     %For gif
     gif_subplots=cell(1,2);
     titles={'Original','Stabilized'};
     
     %Frame 1 
     compensated_frame = rgb2gray(im2double(imread(strcat(directory_sequence, filesep, frame_files(1).name))));
+    imwrite(compensated_frame, [directory_results,filesep,frame_files(1).name]);
     compensated_frameGT = im2double(imread(strcat(directory_sequenceGT, filesep, frame_filesGT(1).name)));
-    imwrite(compensated_frameGT, [directory_resultsGT,filesep,frame_files(1).name]);
+    imwrite(compensated_frameGT, [directory_resultsGT,filesep,frame_filesGT(1).name]);
     for i = 2:length(frame_files)-1
         frame2 = rgb2gray(im2double(imread(strcat(directory_sequence, filesep, frame_files(i).name))));
         frameGT = im2double(imread(strcat(directory_sequenceGT, filesep, frame_filesGT(i).name)));
@@ -36,8 +33,11 @@ function stabilize_videoGT(directory_sequence,directory_sequenceGT,directory_res
         %Compensate second frame
         compensated_frame = get_compensated_image(flow_estimation, frame2);
         compensated_frameGT = get_compensated_image(flow_estimation,frameGT);
+        
         imwrite(compensated_frame, [directory_results,filesep,frame_files(i).name]);
-        imwrite(compensated_frameGT, [directory_resultsGT,filesep,frame_files(i).name]);
+        imwrite(compensated_frameGT, [directory_resultsGT,filesep,frame_filesGT(i).name]);
 
     end
+    imwrite(rgb2gray(im2double(imread(strcat(directory_sequence, filesep, frame_files(i+1).name)))), [directory_results,filesep,frame_files(i+1).name]);%Last frame
+    imwrite(im2double(imread(strcat(directory_sequence, filesep, frame_filesGT(i+1).name))), [directory_results,filesep,frame_filesGT(i+1).name]);
 end
