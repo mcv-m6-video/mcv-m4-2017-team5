@@ -14,6 +14,7 @@ function stabilize_video(directory_sequence,directory_results)
     
     %Frame 1 
     compensated_frame = rgb2gray(im2double(imread(strcat(directory_sequence, filesep, frame_files(1).name))));
+    imwrite(compensated_frame, [directory_results,filesep,frame_files(1).name]);
     for i = 2:length(frame_files)-1
         frame2 = rgb2gray(im2double(imread(strcat(directory_sequence, filesep, frame_files(i).name))));
 
@@ -29,4 +30,5 @@ function stabilize_video(directory_sequence,directory_results)
 
         imwrite(compensated_frame, [directory_results,filesep,frame_files(i).name]);
     end
+    imwrite(compensated_frame, [directory_results,filesep,frame_files(i+1).name]);%Last frame
 end
