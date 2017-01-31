@@ -39,5 +39,5 @@ function stabilize_videoGT(directory_sequence,directory_sequenceGT,directory_res
 
     end
     imwrite(rgb2gray(im2double(imread(strcat(directory_sequence, filesep, frame_files(i+1).name)))), [directory_results,filesep,frame_files(i+1).name]);%Last frame
-    imwrite(im2double(imread(strcat(directory_sequence, filesep, frame_filesGT(i+1).name))), [directory_results,filesep,frame_filesGT(i+1).name]);
+    imwrite(im2double(imread(strcat(directory_sequenceGT, filesep, frame_filesGT(i+1).name))), [directory_results,filesep,frame_filesGT(i+1).name]);
 end
