@@ -12,4 +12,5 @@ end
 
 filename = '../Database/Week02/trafficvideo/traffic.avi';
 
-point_feature_matching(filename,directory_results)
+%point_feature_matching(filename,directory_results);
+vidObj = stabilizationVideo2(60,160);
