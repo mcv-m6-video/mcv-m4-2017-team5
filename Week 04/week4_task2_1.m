@@ -1,4 +1,4 @@
-%Stabilizes the traffic and custom sequences
+%Stabilizes the traffic sequence using block matching
 
 clear all; close all;
 addpath(genpath('.'))
