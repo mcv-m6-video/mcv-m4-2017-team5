@@ -3,15 +3,16 @@
 clear all; close all;
 addpath(genpath('.'))
 
+
+filename = 'customvideo.mp4';
+
 %Where the frames folder is placed
 directory_sequence = '../Results/week4/custom_video';
 if ~exist(directory_sequence, 'dir')
     mkdir(directory_sequence);
+    
+    vid=video2im(filename,directory_sequence,0.25,false);
 end
-
-filename = 'customvideo.mp4';
-
-vid=video2im(filename,false,directory_sequence);
 
 %%
 %Block matching stabilization

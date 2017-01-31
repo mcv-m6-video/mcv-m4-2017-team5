@@ -1,11 +1,10 @@
-function stack = video2im(filename,visualization,write_path)
+function stack = video2im(filename,write_path,resize_scale,visualization)
 
     if nargin < 1
         filename = 'traffic.avi';
-        visualization = false;
     end
 
-    if nargin < 2
+    if nargin < 4
         visualization = false; 
     end
 
@@ -25,6 +24,7 @@ function stack = video2im(filename,visualization,write_path)
     formatSpec = 'video%03d.png';
     for i = 1:numFrames
         fr = im2double(read(v,i));
+        fr = imresize(fr, resize_scale);
         framename=sprintf(formatSpec,i);
         imwrite(fr,strcat(write_path,filesep,framename));
         if visualization
