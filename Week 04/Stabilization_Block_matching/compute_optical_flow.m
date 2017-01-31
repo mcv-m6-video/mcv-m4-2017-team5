@@ -2,8 +2,8 @@ function flow_estimation = compute_optical_flow(frame1, frame2)
     [ni, nj, ~] = size(frame1);
     flow_estimation = zeros(ni, nj, 2);
 
-    N = 1;
-    P = 1;
+    N = 16;
+    P = 16;
 
     for i = 1:N:ni
         for j = 1:N:nj

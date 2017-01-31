@@ -1,3 +1,5 @@
+%Stabilizes the traffic sequence using point feature matching
+
 clear all; close all;
 addpath(genpath('.'))
 
