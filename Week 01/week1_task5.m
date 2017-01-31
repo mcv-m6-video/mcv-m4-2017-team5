@@ -1,9 +1,9 @@
 clear all; close all;
 addpath(genpath('.'));
 
-path_kitti = '../Database/Kitti/images';
+path_kitti = '../Database/Week01/Kitti/images';
 path_results_given_kitti = '../Results_given_week01/results_opticalflow_kitti';
-path_ground_truth = '../Database/Kitti/gt_flow_nocc';
+path_ground_truth = '../Database/Week01/Kitti/gt_flow_nocc';
 
 gt_flow_files=dir(strcat(path_ground_truth,'/*.png'));
 est_flow_files=dir(strcat(path_results_given_kitti,'/*.png'));
