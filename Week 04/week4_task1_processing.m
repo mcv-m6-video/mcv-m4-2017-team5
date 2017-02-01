@@ -56,7 +56,7 @@ text(Ps(P_min), Ns(N_min),PEPN_forward_2(N_min, P_min) - 0.05, ...
 xlabel('P','FontWeight', 'bold')
 ylabel('N','FontWeight', 'bold')
 zlabel('PEPN','FontWeight', 'bold')
-title('Exhaustive search of PEPN in sequence 45','FontWeight', 'bold')
+title('Exhaustive search of PEPN in sequence 157','FontWeight', 'bold')
 % axis square
 
 %%
@@ -141,7 +141,7 @@ scale = 20;
 
 
 plot_optical_flow(Image, Flow_est, rSize, scale, strcat('of_',est_flow_files(i).name));%Plot estimated flow
-title('Optical flow of estimation');
+% title('Optical flow of estimation');
 
 %Mean optical flow
 plot_mean_optical_flow(Image, Flow_est, rSize, scale, strcat('mof_', est_flow_files(i).name));
@@ -177,7 +177,7 @@ scale = 20;
 
 
 plot_optical_flow(Image, Flow_est, rSize, scale, strcat('of_',est_flow_files(i).name));%Plot estimated flow
-title('Optical flow of estimation');
+% title('Optical flow of estimation');
 
 %Mean optical flow
 plot_mean_optical_flow(Image, Flow_est, rSize, scale, strcat('mof_', est_flow_files(i).name));

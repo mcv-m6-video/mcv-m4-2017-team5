@@ -19,7 +19,7 @@ function plot_optical_flow (Image,Optical_flow,rSize,scale,name)
     x(u == 0 & v == 0) = 0;
     y(u == 0 & v == 0) = 0;
 
-    f = figure();
+    f = figure('Color', 'white');
     imshow(Image);
     hold on;
     quiver(x, y, u, v, scale, 'color', 'g', 'linewidth', 1);
