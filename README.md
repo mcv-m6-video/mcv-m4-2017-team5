@@ -52,7 +52,11 @@ This week work performs foreground detection for the sequences that are placed a
 ## [WEEK 4](Week%2004/)
 
 This week work performs optical flow estimation and video stabilization.
+- Task 1: Optical flow using [block matching](Week%2004/week4_task1_1.m), [Lucas-Kanade](Week%2004/week4_task1_2_and_3.m) and [alternative methods](Week%2004/week4_task1_2_and_3.m)
 
+	It uses kitti dataset placed at the [/Database/Week01/Kitti/images](Database/Week01/Kitti/images) directory
+	Week%2004/week4_task1_1_processing.m process the results obtained on the exhaustive search of block matching
+	
 - Task 2: Video stabilization using [block matching](Week%2004/week4_task2_1.m) and [alternative methods](Week%2004/week4_task2_2.m)
 
   It uses the *traffic* sequence placed at the [/Database/Week02/traffic](Database/Week02/traffic/) directory
