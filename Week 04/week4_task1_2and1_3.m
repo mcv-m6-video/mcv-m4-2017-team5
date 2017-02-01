@@ -27,11 +27,11 @@ for list=1:2
                 opticFlow = opticalFlowHS('Smoothness',1,'MaxIteration',100,'VelocityDifference',0);
                 method = 'Horn-Schunck';
             case 3
-                opticFlow = opticalFlowLKDoG('NumFrames',11);
-                method = 'Farneback';
+                opticFlow = opticalFlowLKDoG('NumFrames',3);
+                method = 'Lucas-Kanade derivative of Gaussian';
             case 4
                 opticFlow = opticalFlowFarneback();
-                method = 'Lucas-Kanade derivative of Gaussian';
+                method = 'Farneback';
         end
 
         %Estimate and display the optical flow of objects.
@@ -47,11 +47,11 @@ for list=1:2
 
             [MSE, PEPN] = flow_error (Flow_gt, Flow_est, tau);
         
-%             figure
-%             imshow(frame)
-%             hold on
-%             plot(flow,'DecimationFactor',[5 5],'ScaleFactor',10)
-%             hold off
+            figure
+            imshow(frame)
+            hold on
+            plot(flow,'DecimationFactor',[5 5],'ScaleFactor',10)
+            hold off
         end
         
         Results = [List_images(3) MSE PEPN];
