@@ -1,3 +1,12 @@
+% In this script we calculate the optical flow of two sequences
+% (45 and 157) with different methods, namely:
+% Lucas-Kanade
+% Horn-Schunck
+% Lucas-Kanade derivative of Gaussian
+% Farneback
+% One we have computed the optical flow, we compute the MSE and PEPN for
+% each of the results using a table for each sequence to save it.
+
 clear all; close all;
 addpath(genpath('.'))
 
