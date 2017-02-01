@@ -9,13 +9,11 @@ function performForegroundDetection(directory_sequence,directory_write,gt_dir, d
 
     %Plot Precision-Recall
     figure();
-    xlabel('Recall')
-    ylabel('Precision')
 
     process_type = 5;
     rho = 0.09;
     P=30;
-
+    
     contador = 0;
     for alpha = intervalpha
         contador = contador + 1;
@@ -37,6 +35,7 @@ function performForegroundDetection(directory_sequence,directory_write,gt_dir, d
 
     %Plot Precision-Recall
     plot(metrics2(2,:),metrics2(1,:),'b')
+    legend('Stabilized')
     hold on;
     
     %AUC
@@ -48,9 +47,14 @@ function performForegroundDetection(directory_sequence,directory_write,gt_dir, d
     %Unstabilized
     if compare_unstab
         plot(un_metrics2(2,:),un_metrics2(1,:),'r')
+        legend('Stabilized','Unstabilized')
         un_auc = areaundercurve(un_metrics2(2,:),un_metrics2(1,:));
         
         disp(strcat('AUC unstabilized'));
         disp(un_auc);
     end
+    
+    xlabel('Recall')
+    ylabel('Precision')
+    
 end
