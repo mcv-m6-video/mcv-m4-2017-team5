@@ -12,7 +12,7 @@ directory_sequence = strcat('../Database/Week02/', sequence);
 
 directory_write = strcat('../Results/week2/', sequence);
 directory_write_grid = '../Results/week2/';
-alpha = 0.1510;
+alpha = 1.510;
 rho = 0;
 percentage = 0.5;
 
@@ -30,9 +30,9 @@ imagesSeg = recursive_gaussian( param );
 
 %%
 %Grid search
-min_alpha = 0.001;
+min_alpha = 0.5;
 step_alpha = 0.5;
-max_alpha = 10;
+max_alpha = 10.5;
 alphas = min_alpha:step_alpha:max_alpha;
 
 min_rho = 0;
