@@ -40,32 +40,23 @@ while ~isDone(obj.reader)
         case 'S&G'
             frame = readFrame();
             [centroids, bboxes, mask] = detectObjects(frame);
-            predictNewLocationsOfTracks();
-            [assignments, unassignedTracks, unassignedDetections] = ...
-                detectionToTrackAssignment();
             
-            updateAssignedTracks();
-            updateUnassignedTracks();
-            deleteLostTracks();
-            createNewTracks();
-            
-            displayTrackingResults();
         case 'gaussian'
             frame = readFrame();
             [centroids, bboxes, mask] = detectObjects_recursive_gaussian(frame);
-            predictNewLocationsOfTracks();
-            [assignments, unassignedTracks, unassignedDetections] = ...
-                detectionToTrackAssignment();
             
-            updateAssignedTracks();
-            updateUnassignedTracks();
-            deleteLostTracks();
-            createNewTracks();
-            
-            displayTrackingResults();
     end
+    predictNewLocationsOfTracks();
+    [assignments, unassignedTracks, unassignedDetections] = ...
+        detectionToTrackAssignment();
+    
+    updateAssignedTracks();
+    updateUnassignedTracks();
+    deleteLostTracks();
+    createNewTracks();
     
     displayTrackingResults();
+
     saveTrackingResults(writerObj);
 end
 
