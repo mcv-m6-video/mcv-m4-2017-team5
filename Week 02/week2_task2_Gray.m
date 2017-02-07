@@ -4,9 +4,9 @@ clc
 addpath(genpath('.'))
 
 %Directory where the masks of the different sets are placed
-% sequence = 'highway/';
-sequence = 'fall/';
-% sequence = 'traffic/';
+%sequence = 'highway/'; % rho=0.2 alpha = 2.75 
+%sequence = 'fall/';  % rho=0.1 alpha =3.2
+sequence = 'traffic/'; % rho=0.1 alpha =3.05
 
 directory_sequence = strcat('../Database/Week02/', sequence);
 
@@ -31,7 +31,7 @@ imagesSeg = recursive_gaussian( param );
 %%
 %Grid search
 min_alpha = 0.5;
-step_alpha = 0.5;
+step_alpha = 0.15;
 max_alpha = 10.5;
 alphas = min_alpha:step_alpha:max_alpha;
 
@@ -78,7 +78,7 @@ save(name_file, 'metrics_search', 'alphas', 'rhos')
 %%
 %Plot surface
 seq = strsplit(sequence, '/');
-name_file = strcat(directory_write_grid, 'Grid_search/', seq{1},'_grid_alpha_rho.mat' );
+name_file = strcat(directory_write_grid, 'Grid_search/', seq{1},'_grid_alpha_rho_new.mat' );
 load(name_file)
 
 fmeasure = shiftdim(metrics_search(:, :, 3));
@@ -107,6 +107,8 @@ zlabel('F-measure','FontWeight', 'bold')
 title(strcat('Exhaustive search of F-measure in      ' ,{ ' '}, seq{1}, ' sequence'),'FontWeight', 'bold')
 axis square
 
+rhos(j_max)
+alphas(i_max)
 %%
 sequences = { 'highway/', 'fall/', 'traffic/'};
 for sequ = 1:3

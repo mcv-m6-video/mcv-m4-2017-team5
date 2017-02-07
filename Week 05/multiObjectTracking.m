@@ -1,4 +1,5 @@
-function multiObjectTracking(path_sequence, background_estimation)
+function multiObjectTracking(file_video, output_videofile, background_estimation)
+
 
 % Create System objects used for reading video, detecting moving objects,
 % and displaying the results.
@@ -13,7 +14,8 @@ function multiObjectTracking(path_sequence, background_estimation)
 %       -InvisibleForTooLong = 5 (so cars are distinguished)
 %       -Adding speed (required for our task)-> Using obj.OpticalFlow
 
-obj = setupSystemObjects(path_sequence, background_estimation);
+
+obj = setupSystemObjects(file_video, background_estimation);
 
 if strcmp(background_estimation, 'gaussian')
         background_model = obj.detector;
@@ -21,9 +23,16 @@ if strcmp(background_estimation, 'gaussian')
         final_sigma_model = background_model(:, :, 4:6);
 end
 
+
 tracks = initializeTracks(); % Create an empty array of tracks.
 
 nextId = 1; % ID of the next track
+
+% Initialize videowriter
+frame_rate=24;
+writerObj = VideoWriter(output_videofile);
+writerObj.FrameRate = frame_rate;
+open(writerObj);
 
 % Detect moving objects, and track them across video frames.
 while ~isDone(obj.reader)
@@ -55,17 +64,23 @@ while ~isDone(obj.reader)
             
             displayTrackingResults();
     end
+    
+    displayTrackingResults();
+    saveTrackingResults(writerObj);
 end
 
+% Close videowriter
+close(writerObj);
 
-    function obj = setupSystemObjects(path_sequence, background_estimation)
+ function obj = setupSystemObjects(file_video, background_estimation)
         % Initialize Video I/O
         % Create objects for reading a video from a file, drawing the tracked
         % objects in each frame, and playing the video.
         
         % Create a video file reader.
-        obj.reader = vision.VideoFileReader(path_sequence);
-        
+
+        obj.reader = vision.VideoFileReader(file_video);
+
         % Create two video players, one to display the video,
         % and one to display the foreground mask.
         obj.videoPlayer = vision.VideoPlayer('Position', [20, 400, 700, 400]);
@@ -82,7 +97,7 @@ end
                 obj.detector = vision.ForegroundDetector('NumGaussians', 3, ...
                     'NumTrainingFrames', 40, 'MinimumBackgroundRatio', 0.7);
             case 'gaussian'
-                obj.detector = train_background(path_sequence);
+                obj.detector = train_background(file_video);
         end
         
         % Connected groups of foreground pixels are likely to correspond to moving
@@ -96,8 +111,8 @@ end
         %         velocities = obj.OpticalFlowHS;
         %         print(velocities);
     end
-    function background_model = train_background(path_sequence)
-        switch path_sequence
+    function background_model = train_background(file_video)
+        switch file_video
             case '../Videos_last_week/Road_01_new_scale.avi'
                 filename = '../Videos_last_week/Road_01_for_train.avi';
                 v = VideoReader(filename);
@@ -301,6 +316,7 @@ end
             % Increment the next id.
             nextId = nextId + 1;
         end
+
     end
     function displayTrackingResults()
         % Convert the frame and the mask to uint8 RGB.
@@ -349,5 +365,9 @@ end
         % Display the mask and the frame.
         obj.maskPlayer.step(mask);
         obj.videoPlayer.step(frame);
+    end
+
+    function saveTrackingResults(writerObj)
+        writeVideo(writerObj, frame);
     end
 end
