@@ -36,13 +36,12 @@ open(writerObj);
 
 % Detect moving objects, and track them across video frames.
 while ~isDone(obj.reader)
+    frame = readFrame();
     switch background_estimation
         case 'S&G'
-            frame = readFrame();
             [centroids, bboxes, mask] = detectObjects(frame);
             
         case 'gaussian'
-            frame = readFrame();
             [centroids, bboxes, mask] = detectObjects_recursive_gaussian(frame);
             
     end
