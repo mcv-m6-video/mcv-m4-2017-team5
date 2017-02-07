@@ -1,4 +1,4 @@
-function multiObjectTracking()
+function multiObjectTracking(file_video, output_videofile)
 
 % Create System objects used for reading video, detecting moving objects,
 % and displaying the results.
@@ -13,11 +13,17 @@ function multiObjectTracking()
 %       -InvisibleForTooLong = 5 (so cars are distinguished)
 %       -Adding speed (required for our task)-> Using obj.OpticalFlow
 
-obj = setupSystemObjects();
+obj = setupSystemObjects(file_video);
 
 tracks = initializeTracks(); % Create an empty array of tracks.
 
 nextId = 1; % ID of the next track
+
+% Initialize videowriter
+frame_rate=24;
+writerObj = VideoWriter(output_videofile);
+writerObj.FrameRate = frame_rate;
+open(writerObj);
 
 % Detect moving objects, and track them across video frames.
 while ~isDone(obj.reader)
@@ -33,14 +39,19 @@ while ~isDone(obj.reader)
     createNewTracks();
 
     displayTrackingResults();
+    saveTrackingResults(writerObj);
 end
- function obj = setupSystemObjects()
+
+% Close videowriter
+close(writerObj);
+
+ function obj = setupSystemObjects(file_video)
         % Initialize Video I/O
         % Create objects for reading a video from a file, drawing the tracked
         % objects in each frame, and playing the video.
 
         % Create a video file reader.
-        obj.reader = vision.VideoFileReader('traffic.avi');
+        obj.reader = vision.VideoFileReader(file_video);
 
         % Create two video players, one to display the video,
         % and one to display the foreground mask.
@@ -211,7 +222,7 @@ end
             nextId = nextId + 1;
         end
    end
-    function displayTrackingResults()
+    function displayTrackingResults()        
         % Convert the frame and the mask to uint8 RGB.
         frame = im2uint8(frame);
         mask = uint8(repmat(mask, [1, 1, 3])) .* 255;
@@ -258,5 +269,9 @@ end
         % Display the mask and the frame.
         obj.maskPlayer.step(mask);
         obj.videoPlayer.step(frame);
+    end
+
+    function saveTrackingResults(writerObj)
+        writeVideo(writerObj, frame);
     end
 end
