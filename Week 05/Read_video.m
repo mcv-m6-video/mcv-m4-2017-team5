@@ -1,8 +1,19 @@
 addpath(genpath('.'));
 %%
-path_sequence = '../Videos_last_week/Road_01_new_scale.avi';
-multiObjectTracking(path_sequence, 'gaussian')
+videofile = '../Videos_last_week/Road_01_new_scale.avi';
 
+background_estimation = 'gaussian';% 'S&G' or 'gaussian'
+video_filename = 'Road_01_results.avi';%Name of the tracking video file (the result)
+
+
+output_path = '../Results/week5'; %Directory of results
+if ~exist(output_path, 'dir')
+    mkdir(output_path);
+end
+
+output_videofile = strcat(output_path,filesep,video_filename);
+
+multiObjectTracking(videofile, output_videofile, background_estimation);
 %%
 % write_path = '../Results/week5/Road_01_images';
 % if ~exist(write_path, 'dir')

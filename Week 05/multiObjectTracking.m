@@ -13,15 +13,18 @@ function multiObjectTracking(file_video, output_videofile, background_estimation
 %               Highway:
 %       -InvisibleForTooLong = 5 (so cars are distinguished)
 %       -Adding speed (required for our task)-> Using obj.OpticalFlow
-
-
+if strcmp(background_estimation, 'gaussian')
+    final_mu_model = 0;
+    final_sigma_model = 0;
+    highway = 0;
+    traffic = 0;
+end
 obj = setupSystemObjects(file_video, background_estimation);
 
-if strcmp(background_estimation, 'gaussian')
-        background_model = obj.detector;
-        final_mu_model = background_model(:, :, 1:3);
-        final_sigma_model = background_model(:, :, 4:6);
-end
+% if strcmp(background_estimation, 'gaussian')
+%         final_mu_model = background_model(:, :, 1:3);
+%         final_sigma_model = background_model(:, :, 4:6);
+% end
 
 
 tracks = initializeTracks(); % Create an empty array of tracks.
@@ -29,7 +32,7 @@ tracks = initializeTracks(); % Create an empty array of tracks.
 nextId = 1; % ID of the next track
 
 % Initialize videowriter
-frame_rate=24;
+frame_rate = 24;
 writerObj = VideoWriter(output_videofile);
 writerObj.FrameRate = frame_rate;
 open(writerObj);
@@ -55,22 +58,22 @@ while ~isDone(obj.reader)
     createNewTracks();
     
     displayTrackingResults();
-
+    
     saveTrackingResults(writerObj);
 end
 
 % Close videowriter
 close(writerObj);
 
- function obj = setupSystemObjects(file_video, background_estimation)
+    function obj = setupSystemObjects(file_video, background_estimation)
         % Initialize Video I/O
         % Create objects for reading a video from a file, drawing the tracked
         % objects in each frame, and playing the video.
         
         % Create a video file reader.
-
+        
         obj.reader = vision.VideoFileReader(file_video);
-
+        
         % Create two video players, one to display the video,
         % and one to display the foreground mask.
         obj.videoPlayer = vision.VideoPlayer('Position', [20, 400, 700, 400]);
@@ -87,7 +90,7 @@ close(writerObj);
                 obj.detector = vision.ForegroundDetector('NumGaussians', 3, ...
                     'NumTrainingFrames', 40, 'MinimumBackgroundRatio', 0.7);
             case 'gaussian'
-                obj.detector = train_background(file_video);
+                train_background(file_video);
         end
         
         % Connected groups of foreground pixels are likely to correspond to moving
@@ -101,33 +104,46 @@ close(writerObj);
         %         velocities = obj.OpticalFlowHS;
         %         print(velocities);
     end
-    function background_model = train_background(file_video)
+    function [] = train_background(file_video)
         switch file_video
-            case '../Videos_last_week/Road_01_new_scale.avi'
-                filename = '../Videos_last_week/Road_01_for_train.avi';
-                v = VideoReader(filename);
-                
-                %Reading the video characteristics
-                time = v.duration;
-                frameRate = v.FrameRate;
-                Height = uint32(v.Height);
-                Width = uint32(v.Width);
-                numFrames = uint32(frameRate*time);
-                
-            case 'other'
+            case '../Database/Week05/Road_01/Road_01_new_scale.avi'
+                filename = '../Database/Week05/Road_01/Road_01_for_train.avi';
+            case '../Database/Week05/v2_BG_lights/backgroundlights_motion.avi'
+                filename = '../Database/Week05/v2_BG_lights/backgroundlights_train.avi';
+            case '../Database/Week05/v2_BG_nolights/backgroundNOlights_motion.avi'
+                filename = '../Database/Week05/v2_BG_nolights/backgroundNOlights_train.avi';
+            case '../Database/Week05/v1.avi'
+                error('This does not work')
+            case '../Database/Week05/highway.avi'    
+                filename = '../Database/Week05/highway.avi';
+                highway = 1;
+            case '../Database/Week05/traffic_stabilized.avi'    
+                filename = '../Database/Week05/traffic_stabilized.avi';  
+                traffic = 1;
+        end
+        v = VideoReader(filename);
+        
+        %Reading the video characteristics
+        time = v.duration;
+        frameRate = v.FrameRate;
+        Height = uint32(v.Height);
+        Width = uint32(v.Width);
+        if highway || traffic
+            numFrames = uint32(frameRate*time*0.5);
+        else
+            numFrames = uint32(frameRate*time);
         end
         final_mu_model = zeros(Height, Width, 3);
         final_sigma_model = zeros(Height, Width, 3);
         full_images_train = zeros(Height, Width, 3, numFrames);
         for i = 1:numFrames
-            full_images_train(:, :, :, i) = double(read(v,i));
+            full_images_train(:, :, :, i) = im2double(read(v,i));
         end
         for channel = 1:3
             images_train = shiftdim(full_images_train(:, :, channel, :));
             final_mu_model(:, :, channel) = mean(images_train, 4);
             final_sigma_model(:, :, channel) = std(images_train, 1, 4);
         end
-        background_model =  cat(3, final_mu_model, final_sigma_model);
     end
 
     function tracks = initializeTracks()
@@ -144,7 +160,7 @@ close(writerObj);
         frame = obj.reader.step();
     end
     function [centroids, bboxes, mask] = detectObjects_recursive_gaussian(frame)
-        alpha = 3;
+        alpha = 0.1;
         rho = 0.1;
         % Detect foreground.
         
@@ -153,11 +169,11 @@ close(writerObj);
             im = frame(:, :, channel);
             mu = final_mu_model(:, :, channel);
             sigma = final_sigma_model(:, :, channel);
-
+            
             % Determine if a pixel is background or foreground
             segmentation = abs(im - mu) >= alpha*(2 + sigma);
             
-            
+            mask = mask.*segmentation;
             %Update background model with pixels labeled as background
             mu = (1 - segmentation).*(rho*im + (1 - rho)*mu) + segmentation.*mu;
             sigma = sqrt((1 - segmentation).*(rho.*(im - mu).^2 + (1 - rho).*sigma.^2) + segmentation.*sigma.^2);
@@ -165,7 +181,7 @@ close(writerObj);
             final_mu_model(:, :, channel) = mu;
             final_sigma_model(:, :, channel) = sigma;
         end
-        
+        mask = logical(mask);
         mask = morphological_operators(mask);
         
         
@@ -306,7 +322,7 @@ close(writerObj);
             % Increment the next id.
             nextId = nextId + 1;
         end
-
+        
     end
     function displayTrackingResults()
         % Convert the frame and the mask to uint8 RGB.
