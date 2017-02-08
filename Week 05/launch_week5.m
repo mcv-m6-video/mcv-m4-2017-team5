@@ -2,7 +2,7 @@ clear all; close all;
 addpath(genpath('.'));
 
 background_estimation = 'S&G'; % 'S&G' or 'gaussian' or 'GMM'
-Sequence = 'Traffic';
+Sequence = 'Road01';
 
 switch Sequence %Input video
     case 'Traffic'
@@ -11,8 +11,10 @@ switch Sequence %Input video
         videofile='../Database/Week02/trafficvideo/traffic_stabilized.avi';
     case 'Highway'
         videofile='/Users/lidiatalavera/mcv-m4-2017-team5/Database/Week02/highwayvideo/highway.avi';
-    case 'ownVideo'
-        videofile='/Users/lidiatalavera/mcv-m4-2017-team5/Database/Week02/ownVideo/ownVideo.avi';
+    case 'Road01'
+        videofile = '../Database/Week05/Road_01/Road_01_new_scale.avi';
+%         videofile = '/Users/lidiatalavera/mcv-m4-2017-team5/Database/Week02/ownVideo/ownVideo.avi';
+    case 'v2_lights'
 end
 
 output_path = '../Results/week5';%Directory of results

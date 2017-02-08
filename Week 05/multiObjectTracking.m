@@ -1,4 +1,4 @@
-function multiObjectTracking(file_video,output_videofile,Sequence, background_estimation)
+function multiObjectTracking(file_video, output_videofile, Sequence, background_estimation)
 
 % Create System objects used for reading video, detecting moving objects,
 % and displaying the results.
@@ -17,7 +17,7 @@ function multiObjectTracking(file_video,output_videofile,Sequence, background_es
 %                 mask = imopen(mask,strel('diamond',2));
 %                 mask = imfill(mask,'holes');
 %                   
-%               Onfore: 
+%               Onofre (road 01): 
 %                   mask = imfill(mask, 'holes');
 %                   mask = imopen(mask, strel('rectangle', [7,7]));
 %                   mask = imfill(mask, 'holes');
@@ -28,14 +28,12 @@ function multiObjectTracking(file_video,output_videofile,Sequence, background_es
 if strcmp(background_estimation, 'gaussian')
     final_mu_model = 0;
     final_sigma_model = 0;
-%     highway = 0;
-%     traffic = 0;
 end
 
 obj = setupSystemObjects(file_video, background_estimation);
 
 [tracks, speed_tracks] = initializeTracks(); % Create an empty array of tracks.
-
+maximum_speed = 60;
 nextId = 1; % ID of the next track
 %Params
 params.a0=0; % Keep it at 0 please
@@ -114,28 +112,28 @@ close(writerObj);
 
         obj.blobAnalyser = vision.BlobAnalysis('BoundingBoxOutputPort', true, ...
             'AreaOutputPort', true, 'CentroidOutputPort', true, ...
-            'MinimumBlobArea', 2000); %Roque had 400
+            'MinimumBlobArea', 400); %Roque had 400
  end
 
     function [] = train_background()
-%         switch file_video
-%             case '../Database/Week05/Road_01/Road_01_new_scale.avi'
-%                 filename = '../Database/Week05/Road_01/Road_01_for_train.avi';
-%             case '../Database/Week05/v2_BG_lights/backgroundlights_motion.avi'
-%                 filename = '../Database/Week05/v2_BG_lights/backgroundlights_train.avi';
-%             case '../Database/Week05/v2_BG_nolights/backgroundNOlights_motion.avi'
-%                 filename = '../Database/Week05/v2_BG_nolights/backgroundNOlights_train.avi';
-%             case '../Database/Week05/v1.avi'
-%                 error('This does not work')
-%             case '../Database/Week05/highway.avi'    
-%                 filename = '../Database/Week05/highway.avi';
-%                 highway = 1;
-%             case '../Database/Week05/traffic_stabilized.avi'    
-%                 filename = '../Database/Week05/traffic_stabilized.avi';  
-%                 traffic = 1;
-%         end
-        v = VideoReader(file_video);
-        
+        switch Sequence
+            case 'Road01'
+                filename = '../Database/Week05/Road_01/Road_01_for_train.avi';
+            case '../Database/Week05/v2_BG_lights/backgroundlights_motion.avi'
+                filename = '../Database/Week05/v2_BG_lights/backgroundlights_train.avi';
+            case '../Database/Week05/v2_BG_nolights/backgroundNOlights_motion.avi'
+                filename = '../Database/Week05/v2_BG_nolights/backgroundNOlights_train.avi';
+            case '../Database/Week05/v1.avi'
+                error('This does not work')
+            case 'Highway'    
+                filename = '../Database/Week05/highway.avi';
+            case 'Traffic'    
+                filename = '../Database/Week05/traffic.avi';  
+            case 'Traffic_stabilized'    
+                filename = '../Database/Week05/traffic_stabilized.avi';  
+        end
+%         v = VideoReader(file_video);
+        v = VideoReader(filename);
         %Reading the video characteristics
         time = v.duration;
         frameRate = v.FrameRate;
@@ -185,7 +183,7 @@ close(writerObj);
   end
 
     function [centroids, bboxes, mask] = detectObjects_recursive_gaussian(frame)
-        alpha = 0.1;
+        alpha = 0.15;
         rho = 0.1;
         % Detect foreground.
         
@@ -241,7 +239,7 @@ close(writerObj);
                 mask = imopen(mask,strel('diamond',2));
                 mask = imfill(mask,'holes');
 
-            case 'ownVideo'
+            case 'Road01'
                 mask = imfill(mask, 'holes');
                 mask = imopen(mask, strel('rectangle', [7,7]));
                 mask = imfill(mask, 'holes');
@@ -405,6 +403,8 @@ close(writerObj);
                 elseif strcmp(Sequence, 'Highway')
                     speed_tracks(i).speed = params.pixXframe2kmXh_highway*speed_tracks(i).displacement/speed_tracks(i).frame_count;
                     %disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
+                elseif strcmp(Sequence, 'Road01')
+                    speed_tracks(i).speed = params.pixXframe2kmXh_highway*speed_tracks(i).displacement/speed_tracks(i).frame_count;
                 end
             %end
             %Por defecto
@@ -453,7 +453,7 @@ close(writerObj);
                 % which we display the predicted rather than the actual
                 % location.
                 labels = cellstr(int2str(ids'));
-                
+                colors = cellstr(int2str(ids'));
                 for i=1:length(ids)
                     if reliableSpeedTracks(i).status == 0
                         labels{i} = [int2str(ids(i)), ' ', '(tracking...)'];
@@ -462,6 +462,11 @@ close(writerObj);
                     else
                         labels{i} = [int2str(ids(i)), '     ', num2str(speeds(i)), ' km/h'];
                     end
+                    if speeds(i) > maximum_speed
+                        colors{i} = 'red';
+                    else
+                        colors{i} = 'yellow';
+                    end    
                 end
                 
                 predictedTrackInds = ...
@@ -469,14 +474,14 @@ close(writerObj);
                 isPredicted = cell(size(labels));
                 isPredicted(predictedTrackInds) = {' predicted'};
                 labels = strcat(labels, isPredicted);
-
+                
                 % Draw the objects on the frame.
                 frame = insertObjectAnnotation(frame, 'rectangle', ...
-                    bboxes, labels);
+                    bboxes, labels, 'Color', colors);
 
                 % Draw the objects on the mask.
                 mask = insertObjectAnnotation(mask, 'rectangle', ...
-                    bboxes, labels);
+                    bboxes, labels, 'Color', colors);
             end
         end
 
