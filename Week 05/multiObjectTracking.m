@@ -1,23 +1,50 @@
-function multiObjectTracking(file_video, output_videofile)
+function multiObjectTracking(file_video,output_videofile,Sequence, background_estimation)
 
 % Create System objects used for reading video, detecting moving objects,
 % and displaying the results.
 %Changes from Roque to Matlab Script:
 %       -Morphological operations
 %               Traffic:
-%                 I = imfill(images(:,:,i),4,'holes');
-%                 Iarea = bwareaopen(I,P,30);
-%                 Icl = imopen(Iarea,se4); se4 = strel('line',10,45);
-%                 Iocl = imclose(Icl,se2); se2 = strel('diamond',20);
+%                 mask = imfill(mask,4,'holes');
+%                 mask = bwareaopen(mask,80,4);
+%                 mask = imopen(mask, strel('line',30,45));
+%                 mask = imclose(mask,strel('diamond',20));
+%
 %               Highway:
+%                 mask = imfill(mask,'holes');
+%                 mask = bwareaopen(mask,30,4);
+%                 mask = imclose(mask,strel('diamond',6));
+%                 mask = imopen(mask,strel('diamond',2));
+%                 mask = imfill(mask,'holes');
+%                   
+%               Onfore: 
+%                   mask = imfill(mask, 'holes');
+%                   mask = imopen(mask, strel('rectangle', [7,7]));
+%                   mask = imfill(mask, 'holes');
+%
 %       -InvisibleForTooLong = 5 (so cars are distinguished)
 %       -Adding speed (required for our task)-> Using obj.OpticalFlow
 
-obj = setupSystemObjects(file_video);
+if strcmp(background_estimation, 'gaussian')
+    final_mu_model = 0;
+    final_sigma_model = 0;
+%     highway = 0;
+%     traffic = 0;
+end
 
-tracks = initializeTracks(); % Create an empty array of tracks.
+obj = setupSystemObjects(file_video, background_estimation);
+
+[tracks, speed_tracks] = initializeTracks(); % Create an empty array of tracks.
 
 nextId = 1; % ID of the next track
+%Params
+params.a0=0; % Keep it at 0 please
+params.b0=240-100;
+params.a1=0; % Keep it at 0 please
+params.b1=220;
+
+params.pixXframe2kmXh_highway = 15.0;
+params.pixXframe2kmXh_traffic = 7.0;
 
 % Initialize videowriter
 frame_rate=24;
@@ -28,24 +55,32 @@ open(writerObj);
 % Detect moving objects, and track them across video frames.
 while ~isDone(obj.reader)
     frame = readFrame();
-    [centroids, bboxes, mask] = detectObjects(frame);
+    switch background_estimation
+        case 'S&G'
+            [centroids, bboxes, mask] = detectObjects(frame);
+            
+        case 'gaussian'
+            [centroids, bboxes, mask] = detectObjects_recursive_gaussian(frame);
+            
+    end
     predictNewLocationsOfTracks();
     [assignments, unassignedTracks, unassignedDetections] = ...
         detectionToTrackAssignment();
-
+    
     updateAssignedTracks();
     updateUnassignedTracks();
     deleteLostTracks();
     createNewTracks();
-
+    updateSpeeds();
     displayTrackingResults();
+    
     saveTrackingResults(writerObj);
 end
 
 % Close videowriter
 close(writerObj);
 
- function obj = setupSystemObjects(file_video)
+ function obj = setupSystemObjects(file_video, background_estimation)
         % Initialize Video I/O
         % Create objects for reading a video from a file, drawing the tracked
         % objects in each frame, and playing the video.
@@ -64,9 +99,13 @@ close(writerObj);
         % the background. It outputs a binary mask, where the pixel value
         % of 1 corresponds to the foreground and the value of 0 corresponds
         % to the background.
-
-        obj.detector = vision.ForegroundDetector('NumGaussians', 3, ...
-            'NumTrainingFrames', 40, 'MinimumBackgroundRatio', 0.7);
+        switch  background_estimation
+            case 'S&G'
+                obj.detector = vision.ForegroundDetector('NumGaussians', 3, ...
+                    'NumTrainingFrames', 40, 'MinimumBackgroundRatio', 0.7);
+            case 'gaussian'
+                train_background();
+        end
 
         % Connected groups of foreground pixels are likely to correspond to moving
         % objects.  The blob analysis System object is used to find such groups
@@ -75,11 +114,57 @@ close(writerObj);
 
         obj.blobAnalyser = vision.BlobAnalysis('BoundingBoxOutputPort', true, ...
             'AreaOutputPort', true, 'CentroidOutputPort', true, ...
-            'MinimumBlobArea', 600);
-%         velocities = obj.OpticalFlowHS;
-%         print(velocities);
+            'MinimumBlobArea', 2000); %Roque had 400
  end
-    function tracks = initializeTracks()
+
+    function [] = train_background()
+%         switch file_video
+%             case '../Database/Week05/Road_01/Road_01_new_scale.avi'
+%                 filename = '../Database/Week05/Road_01/Road_01_for_train.avi';
+%             case '../Database/Week05/v2_BG_lights/backgroundlights_motion.avi'
+%                 filename = '../Database/Week05/v2_BG_lights/backgroundlights_train.avi';
+%             case '../Database/Week05/v2_BG_nolights/backgroundNOlights_motion.avi'
+%                 filename = '../Database/Week05/v2_BG_nolights/backgroundNOlights_train.avi';
+%             case '../Database/Week05/v1.avi'
+%                 error('This does not work')
+%             case '../Database/Week05/highway.avi'    
+%                 filename = '../Database/Week05/highway.avi';
+%                 highway = 1;
+%             case '../Database/Week05/traffic_stabilized.avi'    
+%                 filename = '../Database/Week05/traffic_stabilized.avi';  
+%                 traffic = 1;
+%         end
+        v = VideoReader(file_video);
+        
+        %Reading the video characteristics
+        time = v.duration;
+        frameRate = v.FrameRate;
+        Height = uint32(v.Height);
+        Width = uint32(v.Width);
+        
+        if strcmp(Sequence,'Highway') || strcmp(Sequence,'Traffic')
+            numFrames = uint32(frameRate*time*0.5);
+        else
+            numFrames = uint32(frameRate*time);
+        end
+        
+        final_mu_model = zeros(Height, Width, 3);
+        final_sigma_model = zeros(Height, Width, 3);
+        full_images_train = zeros(Height, Width, 3, numFrames);
+        
+        for i = 1:numFrames
+            full_images_train(:, :, :, i) = im2double(read(v,i));
+        end
+        
+        for channel = 1:3
+            images_train = shiftdim(full_images_train(:, :, channel, :));
+            final_mu_model(:, :, channel) = mean(images_train, 4);
+            final_sigma_model(:, :, channel) = std(images_train, 1, 4);
+        end
+    end
+
+
+    function [tracks, speed_tracks] = initializeTracks()
         % create an empty array of tracks
         tracks = struct(...
             'id', {}, ...
@@ -88,28 +173,80 @@ close(writerObj);
             'age', {}, ...
             'totalVisibleCount', {}, ...
             'consecutiveInvisibleCount', {});
+        speed_tracks = struct(...
+            'status', {}, ...
+            'centroid', {}, ...
+            'frame_count', {}, ...
+            'displacement', {}, ...
+            'speed', {});
     end
   function frame = readFrame()
         frame = obj.reader.step();
   end
+
+    function [centroids, bboxes, mask] = detectObjects_recursive_gaussian(frame)
+        alpha = 0.1;
+        rho = 0.1;
+        % Detect foreground.
+        
+        mask = ones(size(frame, 1), size(frame, 2));
+        for channel = 1:3
+            im = frame(:, :, channel);
+            mu = final_mu_model(:, :, channel);
+            sigma = final_sigma_model(:, :, channel);
+            
+            % Determine if a pixel is background or foreground
+            segmentation = abs(im - mu) >= alpha*(2 + sigma);
+            
+            mask = mask.*segmentation;
+            %Update background model with pixels labeled as background
+            mu = (1 - segmentation).*(rho*im + (1 - rho)*mu) + segmentation.*mu;
+            sigma = sqrt((1 - segmentation).*(rho.*(im - mu).^2 + (1 - rho).*sigma.^2) + segmentation.*sigma.^2);
+            
+            final_mu_model(:, :, channel) = mu;
+            final_sigma_model(:, :, channel) = sigma;
+        end
+        mask = logical(mask);
+        mask = morphologicalOperations(Sequence,mask);
+        
+        
+        % Perform blob analysis to find connected components.
+        [~, centroids, bboxes] = obj.blobAnalyser.step(mask);
+    end
+
   function [centroids, bboxes, mask] = detectObjects(frame)
 
         % Detect foreground.
         mask = obj.detector.step(frame);
 
-        % Apply morphological operations to remove noise and fill in holes.
-%         mask = imopen(mask, strel('rectangle', [20,20]));
-%         mask = imclose(mask, strel('rectangle', [5, 5]));
-%         mask = imfill(mask, 'holes');
-          mask = imfill(mask,4,'holes');
-          mask = bwareaopen(mask,80,4);
-          mask = imopen(mask, strel('line',30,45));
-          mask = imclose(mask,strel('diamond',20));
-          
+       % Apply morphological operations to remove noise and fill in holes.
+        mask = morphologicalOperations(Sequence,mask);
 
         % Perform blob analysis to find connected components.
         [~, centroids, bboxes] = obj.blobAnalyser.step(mask);
   end
+    function mask = morphologicalOperations(Sequence,mask)
+        switch Sequence 
+            case 'Traffic'
+                mask = imfill(mask, 'holes');
+                mask = imfill(mask,4,'holes');
+                mask = bwareaopen(mask,80,4);
+                mask = imopen(mask, strel('line',30,45));
+                mask = imclose(mask,strel('diamond',20));
+
+            case 'Highway'
+                mask = imfill(mask,'holes');
+                mask = bwareaopen(mask,30,4);
+                mask = imclose(mask,strel('diamond',6));
+                mask = imopen(mask,strel('diamond',2));
+                mask = imfill(mask,'holes');
+
+            case 'ownVideo'
+                mask = imfill(mask, 'holes');
+                mask = imopen(mask, strel('rectangle', [7,7]));
+                mask = imfill(mask, 'holes');
+        end
+    end
     function predictNewLocationsOfTracks()
         for i = 1:length(tracks)
             bbox = tracks(i).bbox;
@@ -155,7 +292,28 @@ close(writerObj);
             % Replace predicted bounding box with detected
             % bounding box.
             tracks(trackIdx).bbox = bbox;
-
+            
+            
+            % Speed trackers
+            x = double(bbox(1)); y = double(bbox(2)); w = double(bbox(3)); h = double(bbox(4));
+            c_x = (x+(x+w))/2; c_y = (y+(y+h))/2;
+            prev_centroid = speed_tracks(trackIdx).centroid;
+            speed_tracks(trackIdx).centroid = [c_x, c_y];
+                
+                if c_x<=size(frame,2) && c_y<=size(frame,1) && ~(x<=1 || y<=1)
+                    speed_tracks(trackIdx).status = 1;
+                elseif x<=1 || y<=1
+                    speed_tracks(trackIdx).status = 2;
+                else
+                    speed_tracks(trackIdx).status = 0;
+                end
+                if speed_tracks(trackIdx).status == 1;
+                    speed_tracks(trackIdx).displacement = speed_tracks(trackIdx).displacement + sqrt((c_x-double(prev_centroid(1)))^2 + (c_y-double(prev_centroid(2)))^2);
+                    speed_tracks(trackIdx).frame_count = speed_tracks(trackIdx).frame_count + 1;
+                end
+                
+               
+                
             % Update track's age.
             tracks(trackIdx).age = tracks(trackIdx).age + 1;
 
@@ -171,6 +329,7 @@ close(writerObj);
             tracks(ind).age = tracks(ind).age + 1;
             tracks(ind).consecutiveInvisibleCount = ...
                 tracks(ind).consecutiveInvisibleCount + 1;
+            speed_tracks(ind).frame_count = speed_tracks(ind).frame_count + 1;
         end
     end
   function deleteLostTracks()
@@ -178,8 +337,9 @@ close(writerObj);
             return;
         end
 
-        invisibleForTooLong = 5;
-        ageThreshold = 4;
+        %Highway 5,4 ; Traffic 3,3
+        invisibleForTooLong = 3;
+        ageThreshold = 3;
 
         % Compute the fraction of the track's age for which it was visible.
         ages = [tracks(:).age];
@@ -192,6 +352,7 @@ close(writerObj);
 
         % Delete lost tracks.
         tracks = tracks(~lostInds);
+        speed_tracks = speed_tracks(~lostInds);
   end
    function createNewTracks()
         centroids = centroids(unassignedDetections, :);
@@ -214,14 +375,54 @@ close(writerObj);
                 'age', 1, ...
                 'totalVisibleCount', 1, ...
                 'consecutiveInvisibleCount', 0);
+            
+            % Speed trackers
+            x = bbox(1); y = bbox(2); w = bbox(3); h = bbox(4);
+            c_x = (x+(x+w))/2; c_y = (y+(y+h))/2;
+            
+            new_speed_track = struct(...
+                'status', 0, ...
+                'centroid', [c_x, c_y], ...
+                'frame_count', 1, ...
+                'displacement', 0, ...
+                'speed', -1);
 
             % Add it to the array of tracks.
             tracks(end + 1) = newTrack;
+            speed_tracks(end+1) = new_speed_track;
 
             % Increment the next id.
             nextId = nextId + 1;
         end
    end
+
+    function updateSpeeds()
+        for i=1:length(speed_tracks)
+            %if speed_tracks(i).status==2 && speed_tracks(i).speed==-1
+                if strcmp(Sequence,'Traffic')
+                    speed_tracks(i).speed =params.pixXframe2kmXh_traffic*speed_tracks(i).displacement/speed_tracks(i).frame_count;                
+                    disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
+                elseif strcmp(Sequence, 'Highway')
+                    speed_tracks(i).speed = params.pixXframe2kmXh_highway*speed_tracks(i).displacement/speed_tracks(i).frame_count;
+                    %disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
+                end
+            %end
+            %Por defecto
+%             if speed_tracks(i).status==2 && speed_tracks(i).speed==-1
+%                 if(strcmp(video_file,'highway'))
+%                     speed_tracks(i).speed = params.pixXframe2kmXh_highway*speed_tracks(i).displacement/speed_tracks(i).frame_count;
+%                 elseif(strcmp(video_file,'traffic'))
+%                     speed_tracks(i).speed = params.pixXframe2kmXh_traffic*speed_tracks(i).displacement/speed_tracks(i).frame_count;
+%                 else
+%                     speed_tracks(i).speed = params.pixXframe2kmXh_OwnVideo*speed_tracks(i).displacement/speed_tracks(i).frame_count;
+%                 end
+%                 disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
+%             end    
+        end
+                        %disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
+
+    end
+
     function displayTrackingResults()        
         % Convert the frame and the mask to uint8 RGB.
         frame = im2uint8(frame);
@@ -236,7 +437,8 @@ close(writerObj);
             reliableTrackInds = ...
                 [tracks(:).totalVisibleCount] > minVisibleCount;
             reliableTracks = tracks(reliableTrackInds);
-
+            reliableSpeedTracks = speed_tracks(reliableTrackInds);
+            
             % Display the objects. If an object has not been detected
             % in this frame, display its predicted bounding box.
             if ~isempty(reliableTracks)
@@ -245,11 +447,23 @@ close(writerObj);
 
                 % Get ids.
                 ids = int32([reliableTracks(:).id]);
-
+                speeds = [reliableSpeedTracks(:).speed];
+                
                 % Create labels for objects indicating the ones for
                 % which we display the predicted rather than the actual
                 % location.
                 labels = cellstr(int2str(ids'));
+                
+                for i=1:length(ids)
+                    if reliableSpeedTracks(i).status == 0
+                        labels{i} = [int2str(ids(i)), ' ', '(tracking...)'];
+%                      elseif reliableSpeedTracks(i).status == 1
+%                         labels{i} = [int2str(ids(i)), ' ', '(computing...)'];
+                    else
+                        labels{i} = [int2str(ids(i)), '     ', num2str(speeds(i)), ' km/h'];
+                    end
+                end
+                
                 predictedTrackInds = ...
                     [reliableTracks(:).consecutiveInvisibleCount] > 0;
                 isPredicted = cell(size(labels));
@@ -273,5 +487,6 @@ close(writerObj);
 
     function saveTrackingResults(writerObj)
         writeVideo(writerObj, frame);
+        pause(0.03)
     end
 end
