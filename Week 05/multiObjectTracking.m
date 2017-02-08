@@ -114,12 +114,15 @@ close(writerObj);
                 filename = '../Database/Week05/v2_BG_nolights/backgroundNOlights_train.avi';
             case '../Database/Week05/v1.avi'
                 error('This does not work')
+            case '../Database/Week05/v4/v4_motion.avi'
+                filename = '../Database/Week05/v4/v4_train.avi';
             case '../Database/Week05/highway.avi'    
                 filename = '../Database/Week05/highway.avi';
                 highway = 1;
             case '../Database/Week05/traffic_stabilized.avi'    
                 filename = '../Database/Week05/traffic_stabilized.avi';  
                 traffic = 1;
+                
         end
         v = VideoReader(filename);
         
