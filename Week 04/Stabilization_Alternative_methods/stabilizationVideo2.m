@@ -100,6 +100,8 @@ while ~isDone(hVideoSource)
     % Add black border for display
     Stabilized(:, BorderCols) = 0;
     Stabilized(BorderRows, :) = 0;
+    s_color(:, BorderCols,:) = 0;
+    s_color(BorderRows, :,:) = 0;
 
     TargetRect = [pos.template_orig-Offset, pos.template_size];
     SearchRegionRect = [SearchRegion, pos.template_size + 2*pos.search_border];
