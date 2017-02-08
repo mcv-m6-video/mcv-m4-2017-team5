@@ -115,7 +115,7 @@ while ~isDone(hVideoSource)
     %step(hVideoOut, [input(:,:,1) Stabilized]);
 %     subplot(121),imshow(input(:,:,1)), title 'Shaky';
 %     subplot(122),imshow(Stabilized),title 'Compensated';
-    imshowpair(input_color,s_color,'montage');
+    imshowpair(input(:,:,1),Stabilized,'montage');
     writeVideo(vidObj, getframe(gca));
     writeVideo(stabilized_VW, s_color);
 
