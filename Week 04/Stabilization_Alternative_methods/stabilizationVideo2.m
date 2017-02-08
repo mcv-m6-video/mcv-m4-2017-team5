@@ -1,4 +1,4 @@
-function vidObj = stabilizationVideo2(x,y)
+function vidObj = stabilizationVideo2(x,y,filename,output_file)
 %% Video Stabilization
 % This example shows how to remove the effect of camera motion from a video stream.
 
@@ -19,11 +19,11 @@ function vidObj = stabilizationVideo2(x,y)
 % output to be of intensity only video.
 
 % Input video file which needs to be stabilized.
-filename = 'traffic.avi';
 
 hVideoSource = vision.VideoFileReader(filename, ...
                                       'ImageColorSpace', 'Intensity',...
                                       'VideoOutputDataType', 'double');
+colorvideo = vision.VideoFileReader(filename);
 
 %%
 % Create a template matcher System object to compute the location of the
@@ -61,15 +61,19 @@ SearchRegion = pos.template_orig - pos.search_border - 1;
 Offset = [0 0];
 Target = zeros(18,22);
 firstTime = true;
-vidObj = VideoWriter('estabilize.avi');
+vidObj = VideoWriter('estabilize_comparison.avi');
 open(vidObj);
+
+stabilized_VW = VideoWriter(output_file);
+open(stabilized_VW);
+
 
 %% Stream Processing Loop
 % This is the main processing loop which uses the objects we instantiated
 % above to stabilize the input video.
 while ~isDone(hVideoSource)
     input = step(hVideoSource);
-
+    input_color = step(colorvideo);
     % Find location of Target in the input video frame
     if firstTime
       Idx = int32(pos.template_center_pos);
@@ -89,12 +93,15 @@ while ~isDone(hVideoSource)
 
     % Translate video frame to offset the camera motion
     Stabilized = imtranslate(input, Offset, 'linear');
-   
+    s_color = imtranslate(input_color, Offset, 'linear');
+    
     Target = Stabilized(TargetRowIndices, TargetColIndices);
 
     % Add black border for display
     Stabilized(:, BorderCols) = 0;
     Stabilized(BorderRows, :) = 0;
+    s_color(:, BorderCols,:) = 0;
+    s_color(BorderRows, :,:) = 0;
 
     TargetRect = [pos.template_orig-Offset, pos.template_size];
     SearchRegionRect = [SearchRegion, pos.template_size + 2*pos.search_border];
@@ -104,7 +111,7 @@ while ~isDone(hVideoSource)
                         'Color', 'white');
     % Display the offset (displacement) values on the input image
     txt = sprintf('(%+05.1f,%+05.1f)', Offset);
-    input = insertText(input(:,:,1),[191 215],txt,'FontSize',16, ...
+    input = insertText(input,[191 215],txt,'FontSize',16, ...
                     'TextColor', 'white', 'BoxOpacity', 0);
     % Display video
     %step(hVideoOut, [input(:,:,1) Stabilized]);
@@ -112,9 +119,11 @@ while ~isDone(hVideoSource)
 %     subplot(122),imshow(Stabilized),title 'Compensated';
     imshowpair(input(:,:,1),Stabilized,'montage');
     writeVideo(vidObj, getframe(gca));
+    writeVideo(stabilized_VW, s_color);
 
 end
 close(vidObj);
+close(stabilized_VW);
 
 %% Release
 % Here you call the release method on the objects to close any open files
