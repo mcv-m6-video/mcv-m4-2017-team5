@@ -27,6 +27,6 @@ output_videofile=strcat(output_path,filesep,video_filename);
 if strcmp(background_estimation,'GMM')
     Tracking_GMM(videofile,output_videofile,Sequence)
 else
-    multiObjectTrackingT(videofile,output_videofile,Sequence, background_estimation);
+    multiObjectTracking(videofile,output_videofile,Sequence, background_estimation);
 end
 
