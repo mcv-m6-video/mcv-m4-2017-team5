@@ -1,6 +1,6 @@
 files = dir('*.jpg');
-N=24;
-nframe=127;
+N = 24;
+
 writerObj = VideoWriter( 'traffic.avi' );
 writerObj.FrameRate = N;
 open(writerObj);
