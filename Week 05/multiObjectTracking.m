@@ -1,8 +1,5 @@
-<<<<<<< HEAD:Week 05/multiObjectTrackingR.m
 function multiObjectTracking(file_video,output_videofile,Sequence, background_estimation,MBA)
-=======
-function multiObjectTracking(file_video, output_videofile, Sequence, background_estimation)
->>>>>>> 7f4434f166ddb28949d4685fab79c50290cf7f6b:Week 05/multiObjectTracking.m
+
 
 % Create System objects used for reading video, detecting moving objects,
 % and displaying the results.
@@ -122,13 +119,9 @@ close(writerObj);
         
         obj.blobAnalyser = vision.BlobAnalysis('BoundingBoxOutputPort', true, ...
             'AreaOutputPort', true, 'CentroidOutputPort', true, ...
-<<<<<<< HEAD:Week 05/multiObjectTrackingR.m
             'MinimumBlobArea', MBA); %Roque had 400
  end
-=======
-            'MinimumBlobArea', 400); %Roque had 400
-    end
->>>>>>> 7f4434f166ddb28949d4685fab79c50290cf7f6b:Week 05/multiObjectTracking.m
+
 
     function [] = train_background()
         switch Sequence
@@ -411,41 +404,20 @@ close(writerObj);
 
     function updateSpeeds()
         for i=1:length(speed_tracks)
-<<<<<<< HEAD:Week 05/multiObjectTrackingR.m
             if strcmp(Sequence,'Traffic')
                 speed_tracks(i).speed =params.pixXframe2kmXh_traffic*speed_tracks(i).displacement/speed_tracks(i).frame_count;                
-=======
-            %if speed_tracks(i).status==2 && speed_tracks(i).speed==-1
-            if strcmp(Sequence,'Traffic')
-                speed_tracks(i).speed =params.pixXframe2kmXh_traffic*speed_tracks(i).displacement/speed_tracks(i).frame_count;
->>>>>>> 7f4434f166ddb28949d4685fab79c50290cf7f6b:Week 05/multiObjectTracking.m
+
                 disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
             elseif strcmp(Sequence, 'Highway')
                 speed_tracks(i).speed = params.pixXframe2kmXh_highway*speed_tracks(i).displacement/speed_tracks(i).frame_count;
                 %disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
-<<<<<<< HEAD:Week 05/multiObjectTrackingR.m
-            elseif strcmp(Sequence, 'ownVideo')
+
+            elseif strcmp(Sequence, 'Road01')
                 speed_tracks(i).speed = params.pixXframe2kmXh_ownVideo*speed_tracks(i).displacement/speed_tracks(i).frame_count;
                 %disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
             end
       
-=======
-            elseif strcmp(Sequence, 'Road01')
-                speed_tracks(i).speed = params.pixXframe2kmXh_highway*speed_tracks(i).displacement/speed_tracks(i).frame_count;
-            end
-            %end
-            %Por defecto
-            %             if speed_tracks(i).status==2 && speed_tracks(i).speed==-1
-            %                 if(strcmp(video_file,'highway'))
-            %                     speed_tracks(i).speed = params.pixXframe2kmXh_highway*speed_tracks(i).displacement/speed_tracks(i).frame_count;
-            %                 elseif(strcmp(video_file,'traffic'))
-            %                     speed_tracks(i).speed = params.pixXframe2kmXh_traffic*speed_tracks(i).displacement/speed_tracks(i).frame_count;
-            %                 else
-            %                     speed_tracks(i).speed = params.pixXframe2kmXh_OwnVideo*speed_tracks(i).displacement/speed_tracks(i).frame_count;
-            %                 end
-            %                 disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
-            %             end
->>>>>>> 7f4434f166ddb28949d4685fab79c50290cf7f6b:Week 05/multiObjectTracking.m
+
         end
         %disp(['New speed approximation: ', num2str(speed_tracks(i).speed), ' km/h']);
         
