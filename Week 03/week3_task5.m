@@ -12,7 +12,7 @@ addpath(genpath('.'))
 %sequence = 'traffic/';
 
 sequences={'highway/','fall/','traffic/'};
-intervalpha = 0:0.02:0.28;%Alpha values
+intervalpha = 0:1:30.0;%Alpha values
 
 percentage = 0.5;
 cnn = 4;%connectivity for imfill
@@ -29,20 +29,17 @@ for i = 1:length(sequences)%For each sequence
     switch sequence
         case 'highway/'
             process_type = 3;
-            %alpha = 0.101;
-            rho = 0.04;
+            rho = 0.2;
             P= 60;%pixels used for bwareaopen
             plotcolor='g';
         case 'fall/'
             process_type = 4;
-            %alpha = 0.101;
             rho = 0.18;
             P=700;
             plotcolor='r';
         case 'traffic/'
             process_type = 5;
-            %alpha = 0.151;
-            rho = 0.09;
+            rho = 0.1;
             P=30;
             plotcolor='b';
     end

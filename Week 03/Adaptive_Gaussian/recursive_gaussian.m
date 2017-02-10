@@ -12,11 +12,11 @@ imagesSeg = zeros(param.ni, param.nj, length(test));
 
 
 for i = train
-    images_train(:, :, i) = rgb2gray(im2double(imread(strcat(param.directory_imagesIn, param.dirIn(i).name))));
+    images_train(:, :, i) = double(rgb2gray(imread(strcat(param.directory_imagesIn, param.dirIn(i).name))));
 end
 
 for i = 1:length(test)
-    images_test(:, :, i) = rgb2gray(im2double(imread(strcat(param.directory_imagesIn, param.dirIn(test(i)).name))));
+    images_test(:, :, i) = double(rgb2gray(imread(strcat(param.directory_imagesIn, param.dirIn(test(i)).name))));
 end    
 %For the first 50% of the images from the dataset, the background model is
 %trained.
